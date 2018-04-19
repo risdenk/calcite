@@ -58,6 +58,7 @@ limitations under the License.
 
     <!-- This list is in alphabetical order. -->
     <airlift-tpch.version>0.1</airlift-tpch.version>
+    <asm.version>6.1.1</asm.version>
     <avatica.version>1.11.0</avatica.version>
     <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
     <cassandra-driver-core.version>3.4.0</cassandra-driver-core.version>
@@ -73,7 +74,7 @@ limitations under the License.
     <fmpp-maven-plugin.version>1.0</fmpp-maven-plugin.version>
     <foodmart-data-hsqldb.version>0.3</foodmart-data-hsqldb.version>
     <foodmart-queries.version>0.4.1</foodmart-queries.version>
-    <forbiddenapis.version>2.3</forbiddenapis.version>
+    <forbiddenapis.version>2.5</forbiddenapis.version>
     <freemarker.version>2.3.25-incubating</freemarker.version>
     <git-commit-id-plugin.version>2.1.9</git-commit-id-plugin.version>
     <geode.version>1.3.0</geode.version>
@@ -108,7 +109,7 @@ limitations under the License.
     <!-- Apache 19 has 2.10.4, but need 3.0.0 for [LANG-1365]. -->
     <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
     <maven-scm-provider.version>1.9.4</maven-scm-provider.version>
-    <maven-shade-plugin.version>2.1</maven-shade-plugin.version>
+    <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
     <!-- Apache 19 has 2.20.1, but need 2.21.0+ for [MPOM-184] -->
     <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
     <mockito.version>2.5.5</mockito.version>
@@ -127,6 +128,7 @@ limitations under the License.
     <servlet.version>3.0.1</servlet.version>
     <slf4j.version>1.7.13</slf4j.version>
     <spark.version>2.2.0</spark.version>
+    <spotbugs-maven-plugin.version>3.1.3</spotbugs-maven-plugin.version>
     <sqlline.version>1.3.0</sqlline.version>
     <xalan.version>2.7.1</xalan.version>
     <xerces.version>2.9.1</xerces.version>
@@ -751,6 +753,10 @@ limitations under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -854,6 +860,18 @@ limitations under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>${maven-shade-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm-commons</artifactId>
+              <version>${asm.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -898,6 +916,23 @@ limitations under the License.
           <artifactId>git-commit-id-plugin</artifactId>
           <version>${git-commit-id-plugin.version}</version>
         </plugin>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${spotbugs-maven-plugin.version}</version>
+          <configuration>
+            <threshold>High</threshold>
+            <failOnError>false</failOnError>
+            <excludeFilterFile>spotbugs-filter.xml</excludeFilterFile>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -916,6 +951,11 @@ limitations under the License.
           <notimestamp>true</notimestamp>
           <windowtitle>Apache Calcite API</windowtitle>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs-maven-plugin.version}</version>
       </plugin>
     </plugins>
   </reporting>

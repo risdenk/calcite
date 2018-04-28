@@ -62,17 +62,9 @@ public class EnumerableValues extends Values implements EnumerableRel {
     final RelTraitSet traitSet =
         cluster.traitSetOf(EnumerableConvention.INSTANCE)
             .replaceIfs(RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    return RelMdCollation.values(mq, rowType, tuples);
-                  }
-                })
+                () -> RelMdCollation.values(mq, rowType, tuples))
             .replaceIf(RelDistributionTraitDef.INSTANCE,
-                new Supplier<RelDistribution>() {
-                  public RelDistribution get() {
-                    return RelMdDistribution.values(rowType, tuples);
-                  }
-                });
+                () -> RelMdDistribution.values(rowType, tuples));
     return new EnumerableValues(cluster, rowType, tuples, traitSet);
   }
 

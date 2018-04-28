@@ -59,17 +59,9 @@ public class EnumerableFilter
         cluster.traitSetOf(EnumerableConvention.INSTANCE)
             .replaceIfs(
                 RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    return RelMdCollation.filter(mq, input);
-                  }
-                })
+                () -> RelMdCollation.filter(mq, input))
             .replaceIf(RelDistributionTraitDef.INSTANCE,
-                new Supplier<RelDistribution>() {
-                  public RelDistribution get() {
-                    return RelMdDistribution.filter(mq, input);
-                  }
-                });
+                () -> RelMdDistribution.filter(mq, input));
     return new EnumerableFilter(cluster, traitSet, input, condition);
   }
 

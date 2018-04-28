@@ -144,21 +144,18 @@ public class TableScanNode implements Node {
         }
       }
       final List<Field> fields = fieldBuilder.build();
-      rowEnumerable = queryable.select(
-          new Function1<Object, Row>() {
-            public Row apply(Object o) {
-              final Object[] values = new Object[fields.size()];
-              for (int i = 0; i < fields.size(); i++) {
-                Field field = fields.get(i);
-                try {
-                  values[i] = field.get(o);
-                } catch (IllegalAccessException e) {
-                  throw new RuntimeException(e);
-                }
-              }
-              return new Row(values);
-            }
-          });
+      rowEnumerable = queryable.select(o -> {
+        final Object[] values = new Object[fields.size()];
+        for (int i = 0; i < fields.size(); i++) {
+          Field field = fields.get(i);
+          try {
+            values[i] = field.get(o);
+          } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        return new Row(values);
+      });
     } else {
       rowEnumerable =
           Schemas.queryable(root, Row.class, relOptTable.getQualifiedName());
@@ -270,14 +267,11 @@ public class TableScanNode implements Node {
       final Scalar condition =
           compiler.compile(ImmutableList.of(filter2), inputRowType);
       final Context context = compiler.createContext();
-      enumerable = enumerable.where(
-          new Predicate1<Row>() {
-            @Override public boolean apply(Row row) {
-              context.values = row.getValues();
-              Boolean b = (Boolean) condition.execute(context);
-              return b != null && b;
-            }
-          });
+      enumerable = enumerable.where(row -> {
+        context.values = row.getValues();
+        Boolean b = (Boolean) condition.execute(context);
+        return b != null && b;
+      });
     }
     if (rejectedProjects != null) {
       enumerable = enumerable.select(

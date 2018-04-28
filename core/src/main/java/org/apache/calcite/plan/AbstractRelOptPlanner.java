@@ -21,7 +21,6 @@ import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
 import org.apache.calcite.rex.RexExecutor;
-import org.apache.calcite.runtime.PredicateImpl;
 import org.apache.calcite.util.CancelFlag;
 
 import com.google.common.collect.ImmutableList;
@@ -417,12 +416,7 @@ public abstract class AbstractRelOptPlanner implements RelOptPlanner {
   /** Returns sub-classes of relational expression. */
   public Iterable<Class<? extends RelNode>> subClasses(
       final Class<? extends RelNode> clazz) {
-    return Iterables.filter(classes,
-        new PredicateImpl<Class<? extends RelNode>>() {
-          public boolean test(Class<? extends RelNode> input) {
-            return clazz.isAssignableFrom(input);
-          }
-        });
+    return Iterables.filter(classes, clazz::isAssignableFrom);
   }
 }
 

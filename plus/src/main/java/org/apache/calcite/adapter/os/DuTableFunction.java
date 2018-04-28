@@ -44,11 +44,9 @@ public class DuTableFunction {
     return new ScannableTable() {
       public Enumerable<Object[]> scan(DataContext root) {
         return Processes.processLines("du", "-ak")
-            .select(new Function1<String, Object[]>() {
-              public Object[] apply(String a0) {
-                final String[] fields = a0.split("\t");
-                return new Object[] {Long.valueOf(fields[0]), fields[1]};
-              }
+            .select(a0 -> {
+              final String[] fields = a0.split("\t");
+              return new Object[] {Long.valueOf(fields[0]), fields[1]};
             });
       }
 

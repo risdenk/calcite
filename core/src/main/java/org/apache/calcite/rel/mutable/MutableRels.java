@@ -275,13 +275,10 @@ public abstract class MutableRels {
     }
   }
 
-  private static List<RelNode> fromMutables(List<MutableRel> nodes, final RelBuilder relBuilder) {
+  private static List<RelNode> fromMutables(List<MutableRel> nodes,
+      final RelBuilder relBuilder) {
     return Lists.transform(nodes,
-        new Function<MutableRel, RelNode>() {
-          public RelNode apply(MutableRel mutableRel) {
-            return fromMutable(mutableRel, relBuilder);
-          }
-        });
+        mutableRel -> fromMutable(mutableRel, relBuilder));
   }
 
   public static MutableRel toMutable(RelNode rel) {
@@ -408,12 +405,7 @@ public abstract class MutableRels {
   }
 
   private static List<MutableRel> toMutables(List<RelNode> nodes) {
-    return Lists.transform(nodes,
-        new Function<RelNode, MutableRel>() {
-          public MutableRel apply(RelNode relNode) {
-            return toMutable(relNode);
-          }
-        });
+    return Lists.transform(nodes, MutableRels::toMutable);
   }
 }
 

@@ -121,17 +121,14 @@ public class JdbcTable extends AbstractQueryableTable
   private List<Pair<ColumnMetaData.Rep, Integer>> fieldClasses(
       final JavaTypeFactory typeFactory) {
     final RelDataType rowType = protoRowType.apply(typeFactory);
-    return Lists.transform(rowType.getFieldList(),
-        new Function<RelDataTypeField, Pair<ColumnMetaData.Rep, Integer>>() {
-          public Pair<ColumnMetaData.Rep, Integer> apply(RelDataTypeField f) {
-            final RelDataType type = f.getType();
-            final Class clazz = (Class) typeFactory.getJavaClass(type);
-            final ColumnMetaData.Rep rep =
-                Util.first(ColumnMetaData.Rep.of(clazz),
-                    ColumnMetaData.Rep.OBJECT);
-            return Pair.of(rep, type.getSqlTypeName().getJdbcOrdinal());
-          }
-        });
+    return Lists.transform(rowType.getFieldList(), f -> {
+      final RelDataType type = f.getType();
+      final Class clazz = (Class) typeFactory.getJavaClass(type);
+      final ColumnMetaData.Rep rep =
+          Util.first(ColumnMetaData.Rep.of(clazz),
+              ColumnMetaData.Rep.OBJECT);
+      return Pair.of(rep, type.getSqlTypeName().getJdbcOrdinal());
+    });
   }
 
   SqlString generateSql() {

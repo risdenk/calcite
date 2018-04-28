@@ -102,12 +102,8 @@ public abstract class SetOp extends AbstractRelNode {
   }
 
   @Override protected RelDataType deriveRowType() {
-    final List<RelDataType> inputRowTypes = Lists.transform(inputs,
-        new Function<RelNode, RelDataType>() {
-          public RelDataType apply(RelNode input) {
-            return input.getRowType();
-          }
-        });
+    final List<RelDataType> inputRowTypes =
+        Lists.transform(inputs, RelNode::getRowType);
     final RelDataType rowType =
         getCluster().getTypeFactory().leastRestrictive(inputRowTypes);
     if (rowType == null) {

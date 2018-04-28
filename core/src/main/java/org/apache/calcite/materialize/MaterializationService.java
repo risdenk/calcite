@@ -70,20 +70,17 @@ public class MaterializationService {
       };
 
   private static final Comparator<Pair<CalciteSchema.TableEntry, TileKey>> C =
-      new Comparator<Pair<CalciteSchema.TableEntry, TileKey>>() {
-        public int compare(Pair<CalciteSchema.TableEntry, TileKey> o0,
-            Pair<CalciteSchema.TableEntry, TileKey> o1) {
-          // We prefer rolling up from the table with the fewest rows.
-          final Table t0 = o0.left.getTable();
-          final Table t1 = o1.left.getTable();
-          int c = Double.compare(t0.getStatistic().getRowCount(),
-              t1.getStatistic().getRowCount());
-          if (c != 0) {
-            return c;
-          }
-          // Tie-break based on table name.
-          return o0.left.name.compareTo(o1.left.name);
+      (o0, o1) -> {
+        // We prefer rolling up from the table with the fewest rows.
+        final Table t0 = o0.left.getTable();
+        final Table t1 = o1.left.getTable();
+        int c = Double.compare(t0.getStatistic().getRowCount(),
+            t1.getStatistic().getRowCount());
+        if (c != 0) {
+          return c;
         }
+        // Tie-break based on table name.
+        return o0.left.name.compareTo(o1.left.name);
       };
 
   private final MaterializationActor actor = new MaterializationActor();
@@ -380,12 +377,7 @@ public class MaterializationService {
       return CloneSchema.createCloneTable(connection.getTypeFactory(),
           RelDataTypeImpl.proto(calciteSignature.rowType),
           calciteSignature.getCollationList(),
-          Lists.transform(calciteSignature.columns,
-              new Function<ColumnMetaData, ColumnMetaData.Rep>() {
-                public ColumnMetaData.Rep apply(ColumnMetaData column) {
-                  return column.type.rep;
-                }
-              }),
+          Lists.transform(calciteSignature.columns, column -> column.type.rep),
           new AbstractQueryable<Object>() {
             public Enumerator<Object> enumerator() {
               final DataContext dataContext =

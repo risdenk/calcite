@@ -76,7 +76,7 @@ public class SqlUserDefinedTableMacro extends SqlFunction {
 
   @Override public List<String> getParamNames() {
     return Lists.transform(tableMacro.getParameters(),
-        FunctionParameter.NAME_FN);
+        FunctionParameter::getName);
   }
 
   /** Returns the table in this UDF, or null if there is no table. */
@@ -181,8 +181,7 @@ public class SqlUserDefinedTableMacro extends SqlFunction {
         RexToLixTranslator.convert(Expressions.constant(o), clazz);
     bb.add(Expressions.return_(null, expr));
     final FunctionExpression convert =
-        Expressions.lambda(bb.toBlock(),
-            Collections.<ParameterExpression>emptyList());
+        Expressions.lambda(bb.toBlock(), Collections.emptyList());
     return convert.compile().dynamicInvoke();
   }
 

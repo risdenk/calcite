@@ -113,11 +113,9 @@ public class CassandraSchema extends AbstractSchema {
     this.parentSchema = parentSchema;
     this.name = name;
 
-    this.hook = Hook.TRIMMED.add(new Function<RelNode, Void>() {
-      public Void apply(RelNode node) {
-        CassandraSchema.this.addMaterializedViews();
-        return null;
-      }
+    this.hook = Hook.TRIMMED.add(node -> {
+      CassandraSchema.this.addMaterializedViews();
+      return null;
     });
   }
 

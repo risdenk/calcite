@@ -110,13 +110,8 @@ public final class LogicalProject extends Project {
     final RelMetadataQuery mq = cluster.getMetadataQuery();
     final RelTraitSet traitSet =
         cluster.traitSet().replace(Convention.NONE)
-            .replaceIfs(
-                RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    return RelMdCollation.project(mq, input, projects);
-                  }
-                });
+            .replaceIfs(RelCollationTraitDef.INSTANCE,
+                () -> RelMdCollation.project(mq, input, projects));
     return new LogicalProject(cluster, traitSet, input, projects, rowType);
   }
 

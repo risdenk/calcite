@@ -234,12 +234,7 @@ public interface SqlValidatorScope {
 
     /** Returns a list ["step1", "step2"]. */
     List<String> stepNames() {
-      return Lists.transform(steps(),
-          new Function<Step, String>() {
-            public String apply(Step input) {
-              return input.name;
-            }
-          });
+      return Lists.transform(steps(), input -> input.name);
     }
 
     protected void build(ImmutableList.Builder<Step> paths) {

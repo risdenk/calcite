@@ -97,11 +97,7 @@ public class AggregateFilterTransposeRule extends RelOptRule {
         aggregate.copy(aggregate.getTraitSet(), input,
                 false, newGroupSet, null, aggregate.getAggCallList());
     final Mappings.TargetMapping mapping = Mappings.target(
-        new Function<Integer, Integer>() {
-          public Integer apply(Integer a0) {
-            return newGroupSet.indexOf(a0);
-          }
-        },
+        newGroupSet::indexOf,
         input.getRowType().getFieldCount(),
         newGroupSet.cardinality());
     final RexNode newCondition =

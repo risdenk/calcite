@@ -51,10 +51,8 @@ public class ExceptionMessageTest {
         new Entry(2, "name2")
     };
 
-    public Iterable<Entry> badEntries = new Iterable<Entry>() {
-      public Iterator<Entry> iterator() {
-        throw new IllegalStateException("Can't iterate over badEntries");
-      }
+    public Iterable<Entry> badEntries = () -> {
+      throw new IllegalStateException("Can't iterate over badEntries");
     };
   }
 

@@ -324,11 +324,7 @@ public class RelStructuredTypeFlattener implements ReflectiveVisitor {
   private Mappings.TargetMapping getNewForOldInputMapping(RelNode oldRel) {
     final RelNode newRel = getNewForOldRel(oldRel);
     return Mappings.target(
-        new Function<Integer, Integer>() {
-          public Integer apply(Integer oldInput) {
-            return getNewForOldInput(oldInput);
-          }
-        },
+        this::getNewForOldInput,
         oldRel.getRowType().getFieldCount(),
         newRel.getRowType().getFieldCount());
   }

@@ -72,7 +72,6 @@ import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Util;
 import org.apache.calcite.util.trace.CalciteTrace;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 
@@ -81,7 +80,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 /**
  * Rules and relational operators for
@@ -100,7 +99,7 @@ public class JdbcRules {
 
   public static List<RelOptRule> rules(JdbcConvention out,
       RelBuilderFactory relBuilderFactory) {
-    return ImmutableList.<RelOptRule>of(
+    return ImmutableList.of(
         new JdbcToEnumerableConverterRule(out, relBuilderFactory),
         new JdbcJoinRule(out, relBuilderFactory),
         new JdbcCalcRule(out, relBuilderFactory),
@@ -119,10 +118,11 @@ public class JdbcRules {
   abstract static class JdbcConverterRule extends ConverterRule {
     protected final JdbcConvention out;
 
+    @SuppressWarnings("unchecked")
     @Deprecated // to be removed before 2.0
     JdbcConverterRule(Class<? extends RelNode> clazz, RelTrait in,
         JdbcConvention out, String description) {
-      this(clazz, Predicates.<RelNode>alwaysTrue(), in, out,
+      this(clazz, (Predicate) r -> true, in, out,
           RelFactories.LOGICAL_BUILDER, description);
     }
 
@@ -131,6 +131,16 @@ public class JdbcRules {
         RelBuilderFactory relBuilderFactory, String description) {
       super(clazz, predicate, in, out, relBuilderFactory, description);
       this.out = out;
+    }
+
+    @SuppressWarnings("Guava")
+    @Deprecated // to be removed before 2.0
+    <R extends RelNode> JdbcConverterRule(Class<R> clazz,
+        com.google.common.base.Predicate<? super R> predicate,
+        RelTrait in, JdbcConvention out,
+        RelBuilderFactory relBuilderFactory, String description) {
+      this(clazz, (Predicate<R>) predicate, in, out, relBuilderFactory,
+          description);
     }
   }
 
@@ -380,16 +390,10 @@ public class JdbcRules {
     /** Creates a JdbcProjectRule. */
     public JdbcProjectRule(final JdbcConvention out,
         RelBuilderFactory relBuilderFactory) {
-      super(Project.class,
-          new PredicateImpl<Project>() {
-            public boolean test(@Nullable Project project) {
-              assert project != null;
-              return (out.dialect.supportsWindowFunctions()
+      super(Project.class, (Predicate<Project>) project ->
+              (out.dialect.supportsWindowFunctions()
                   || !RexOver.containsOver(project.getProjects(), null))
-                  && !userDefinedFunctionInProject(project);
-            }
-
-          },
+                  && !userDefinedFunctionInProject(project),
           Convention.NONE, out, relBuilderFactory, "JdbcProjectRule");
     }
 

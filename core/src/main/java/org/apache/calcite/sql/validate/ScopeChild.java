@@ -29,20 +29,6 @@ class ScopeChild {
   final SqlValidatorNamespace namespace;
   final boolean nullable;
 
-  static final Function<ScopeChild, SqlValidatorNamespace> NAMESPACE_FN =
-      new Function<ScopeChild, SqlValidatorNamespace>() {
-        public SqlValidatorNamespace apply(ScopeChild input) {
-          return input.namespace;
-        }
-      };
-
-  static final Function<ScopeChild, String> NAME_FN =
-      new Function<ScopeChild, String>() {
-        public String apply(ScopeChild input) {
-          return input.name;
-        }
-      };
-
   /** Creates a ScopeChild.
    *
    * @param ordinal Ordinal of child within parent scope

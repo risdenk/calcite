@@ -102,9 +102,7 @@ import org.apache.calcite.rel.rules.UnionToDistinctRule;
 import org.apache.calcite.rel.rules.ValuesReduceRule;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
-import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.runtime.Hook;
-import org.apache.calcite.runtime.PredicateImpl;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.SqlTypeName;
@@ -113,21 +111,27 @@ import org.apache.calcite.sql2rel.SqlToRelConverter;
 import org.apache.calcite.tools.RelBuilder;
 
 import static org.apache.calcite.plan.RelOptRule.none;
-import static org.apache.calcite.plan.RelOptRule.operand;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+import static org.apache.calcite.plan.RelOptRule.operand;
+import static org.apache.calcite.plan.RelOptRule.operandJ;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -444,11 +448,7 @@ public class RelOptRulesTest extends RelOptTestBase {
             .addRuleInstance(ProjectMergeRule.INSTANCE)
             .build();
     final FilterJoinRule.Predicate predicate =
-        new FilterJoinRule.Predicate() {
-          public boolean apply(Join join, JoinRelType joinType, RexNode exp) {
-            return joinType != JoinRelType.INNER;
-          }
-        };
+        (join, joinType, exp) -> joinType != JoinRelType.INNER;
     final FilterJoinRule join =
         new FilterJoinRule.JoinConditionPushRule(RelBuilder.proto(), predicate);
     final FilterJoinRule filterOnJoin =
@@ -2604,11 +2604,11 @@ public class RelOptRulesTest extends RelOptTestBase {
     final AggregateExtractProjectRule rule =
         new AggregateExtractProjectRule(
             operand(Aggregate.class,
-                operand(Project.class, null,
-                    new PredicateImpl<Project>() {
+                operandJ(Project.class, null,
+                    new Predicate<Project>() {
                       int matchCount = 0;
 
-                      public boolean test(@Nullable Project project) {
+                      public boolean test(Project project) {
                         return matchCount++ == 0;
                       }
                     },
@@ -2663,7 +2663,7 @@ public class RelOptRulesTest extends RelOptTestBase {
     final RelRoot root = tester.convertSqlToRel(sql);
     final RelNode relInitial = root.rel;
 
-    assertTrue(relInitial != null);
+    assertThat(relInitial, notNullValue());
 
     List<RelMetadataProvider> list = Lists.newArrayList();
     list.add(DefaultRelMetadataProvider.INSTANCE);

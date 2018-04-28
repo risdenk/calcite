@@ -17,12 +17,10 @@
 package org.apache.calcite.sql.fun;
 
 import org.apache.calcite.avatica.util.TimeUnit;
-import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
-import org.apache.calcite.sql.SqlOperatorBinding;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.SqlReturnTypeInference;
 import org.apache.calcite.sql.type.SqlTypeFamily;
@@ -57,22 +55,20 @@ import org.apache.calcite.sql.type.SqlTypeName;
 class SqlTimestampAddFunction extends SqlFunction {
 
   private static final SqlReturnTypeInference RETURN_TYPE_INFERENCE =
-      new SqlReturnTypeInference() {
-        public RelDataType inferReturnType(SqlOperatorBinding opBinding) {
-          final RelDataTypeFactory typeFactory = opBinding.getTypeFactory();
-          switch (opBinding.getOperandLiteralValue(0, TimeUnit.class)) {
-          case HOUR:
-          case MINUTE:
-          case SECOND:
-          case MILLISECOND:
-          case MICROSECOND:
-            return typeFactory.createTypeWithNullability(
-                typeFactory.createSqlType(SqlTypeName.TIMESTAMP),
-                opBinding.getOperandType(1).isNullable()
-                    || opBinding.getOperandType(2).isNullable());
-          default:
-            return opBinding.getOperandType(2);
-          }
+      opBinding -> {
+        final RelDataTypeFactory typeFactory = opBinding.getTypeFactory();
+        switch (opBinding.getOperandLiteralValue(0, TimeUnit.class)) {
+        case HOUR:
+        case MINUTE:
+        case SECOND:
+        case MILLISECOND:
+        case MICROSECOND:
+          return typeFactory.createTypeWithNullability(
+              typeFactory.createSqlType(SqlTypeName.TIMESTAMP),
+              opBinding.getOperandType(1).isNullable()
+                  || opBinding.getOperandType(2).isNullable());
+        default:
+          return opBinding.getOperandType(2);
         }
       };
 

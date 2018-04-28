@@ -59,12 +59,7 @@ abstract class MutableMultiRel extends MutableRel {
   }
 
   protected List<MutableRel> cloneChildren() {
-    return Lists.transform(inputs,
-        new Function<MutableRel, MutableRel>() {
-          public MutableRel apply(MutableRel mutableRel) {
-            return mutableRel.clone();
-          }
-        });
+    return Lists.transform(inputs, MutableRel::clone);
   }
 }
 

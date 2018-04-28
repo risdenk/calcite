@@ -52,18 +52,8 @@ class CatalogScope extends DelegatingScope {
         Linq4j.asEnumerable(
             validator.getCatalogReader()
                 .getAllSchemaObjectNames(ImmutableList.<String>of()))
-            .where(
-                new Predicate1<SqlMoniker>() {
-                  public boolean apply(SqlMoniker input) {
-                    return input.getType() == SqlMonikerType.SCHEMA;
-                  }
-                })
-            .select(
-                new Function1<SqlMoniker, List<String>>() {
-                  public List<String> apply(SqlMoniker input) {
-                    return input.getFullyQualifiedNames();
-                  }
-                })
+            .where(input -> input.getType() == SqlMonikerType.SCHEMA)
+            .select(SqlMoniker::getFullyQualifiedNames)
             .into(Sets.<List<String>>newHashSet());
   }
 

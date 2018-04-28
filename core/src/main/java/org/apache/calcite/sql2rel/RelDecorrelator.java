@@ -282,26 +282,24 @@ public class RelDecorrelator implements ReflectiveVisitor {
   }
 
   private Function2<RelNode, RelNode, Void> createCopyHook() {
-    return new Function2<RelNode, RelNode, Void>() {
-      public Void apply(RelNode oldNode, RelNode newNode) {
-        if (cm.mapRefRelToCorRef.containsKey(oldNode)) {
-          cm.mapRefRelToCorRef.putAll(newNode,
-              cm.mapRefRelToCorRef.get(oldNode));
-        }
-        if (oldNode instanceof LogicalCorrelate
-            && newNode instanceof LogicalCorrelate) {
-          LogicalCorrelate oldCor = (LogicalCorrelate) oldNode;
-          CorrelationId c = oldCor.getCorrelationId();
-          if (cm.mapCorToCorRel.get(c) == oldNode) {
-            cm.mapCorToCorRel.put(c, newNode);
-          }
-
-          if (generatedCorRels.contains(oldNode)) {
-            generatedCorRels.add((LogicalCorrelate) newNode);
-          }
-        }
-        return null;
+    return (oldNode, newNode) -> {
+      if (cm.mapRefRelToCorRef.containsKey(oldNode)) {
+        cm.mapRefRelToCorRef.putAll(newNode,
+            cm.mapRefRelToCorRef.get(oldNode));
       }
+      if (oldNode instanceof LogicalCorrelate
+          && newNode instanceof LogicalCorrelate) {
+        LogicalCorrelate oldCor = (LogicalCorrelate) oldNode;
+        CorrelationId c = oldCor.getCorrelationId();
+        if (cm.mapCorToCorRel.get(c) == oldNode) {
+          cm.mapCorToCorRel.put(c, newNode);
+        }
+
+        if (generatedCorRels.contains(oldNode)) {
+          generatedCorRels.add((LogicalCorrelate) newNode);
+        }
+      }
+      return null;
     };
   }
 
@@ -2670,13 +2668,10 @@ public class RelDecorrelator implements ReflectiveVisitor {
         new TreeMap<>();
 
     final SortedSetMultimap<RelNode, CorRef> mapRefRelToCorRef =
-        Multimaps.newSortedSetMultimap(
-            new HashMap<RelNode, Collection<CorRef>>(),
-            new Supplier<TreeSet<CorRef>>() {
-              public TreeSet<CorRef> get() {
-                Bug.upgrade("use MultimapBuilder when we're on Guava-16");
-                return Sets.newTreeSet();
-              }
+        Multimaps.newSortedSetMultimap(new HashMap<>(),
+            () -> {
+              Bug.upgrade("use MultimapBuilder when we're on Guava-16");
+              return Sets.newTreeSet();
             });
 
     final Map<RexFieldAccess, CorRef> mapFieldAccessToCorVar = new HashMap<>();

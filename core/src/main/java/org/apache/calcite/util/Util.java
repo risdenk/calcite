@@ -29,7 +29,6 @@ import org.apache.calcite.sql.SqlValuesOperator;
 import org.apache.calcite.sql.fun.SqlRowOperator;
 import org.apache.calcite.sql.util.SqlBasicVisitor;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
@@ -79,6 +78,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,10 +94,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import java.util.stream.Collector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -1602,11 +1606,7 @@ public class Util {
   public static <E> Iterable<E> cast(
       final Iterable<? super E> iterable,
       final Class<E> clazz) {
-    return new Iterable<E>() {
-      public Iterator<E> iterator() {
-        return cast(iterable.iterator(), clazz);
-      }
-    };
+    return () -> cast(iterable.iterator(), clazz);
   }
 
   /**
@@ -1630,11 +1630,7 @@ public class Util {
   public static <E> Iterable<E> filter(
       final Iterable<?> iterable,
       final Class<E> includeFilter) {
-    return new Iterable<E>() {
-      public Iterator<E> iterator() {
-        return new Filterator<>(iterable.iterator(), includeFilter);
-      }
-    };
+    return () -> new Filterator<>(iterable.iterator(), includeFilter);
   }
 
   public static <E> Collection<E> filter(
@@ -2198,16 +2194,11 @@ public class Util {
    * @param <V> Value type
    * @return Map that is a view onto the values
    */
-  public static <K, V> Map<K, V> asIndexMap(
+  public static <K, V> Map<K, V> asIndexMapJ(
       final Collection<V> values,
       final Function<V, K> function) {
     final Collection<Map.Entry<K, V>> entries =
-        Collections2.transform(values,
-            new Function<V, Map.Entry<K, V>>() {
-              public Map.Entry<K, V> apply(@Nullable V input) {
-                return Pair.of(function.apply(input), input);
-              }
-            });
+        Collections2.transform(values, v -> Pair.of(function.apply(v), v));
     final Set<Map.Entry<K, V>> entrySet =
         new AbstractSet<Map.Entry<K, V>>() {
           public Iterator<Map.Entry<K, V>> iterator() {
@@ -2223,6 +2214,14 @@ public class Util {
         return entrySet;
       }
     };
+  }
+
+  @SuppressWarnings("Guava")
+  @Deprecated
+  public static <K, V> Map<K, V> asIndexMap(
+      final Collection<V> values,
+      final com.google.common.base.Function<V, K> function) {
+    return asIndexMapJ(values, function::apply);
   }
 
   /**
@@ -2286,7 +2285,8 @@ public class Util {
     if (n == 0) {
       // Lists are already immutable. Furthermore, if the outer list is
       // immutable we will just return "lists" unchanged.
-      return ImmutableList.copyOf((Iterable) lists);
+      //noinspection unchecked
+      return ImmutableList.copyOf((Iterable<List<E>>) lists);
     }
     final ImmutableList.Builder<List<E>> builder =
         ImmutableList.builder();
@@ -2344,6 +2344,42 @@ public class Util {
     Calendar calendar = calendar();
     calendar.setTimeInMillis(millis);
     return calendar;
+  }
+
+  /**
+   * Returns a {@code Collector} that accumulates the input elements into a
+   * Guava {@link ImmutableList} via a {@link ImmutableList.Builder}.
+   *
+   * @param <T> the type of the input elements
+   * @return a {@code Collector} that collects all the input elements into an
+   * {@code {@link ImmutableList}, in encounter order
+   */
+  public static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>
+  toImmutableList() {
+    return new Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>() {
+      public Supplier<ImmutableList.Builder<T>> supplier() {
+        return ImmutableList::builder;
+      }
+
+      public BiConsumer<ImmutableList.Builder<T>, T> accumulator() {
+        return ImmutableList.Builder::add;
+      }
+
+      public BinaryOperator<ImmutableList.Builder<T>> combiner() {
+        return (t, u) -> {
+          t.addAll(u.build());
+          return t;
+        };
+      }
+
+      public java.util.function.Function<ImmutableList.Builder<T>, ImmutableList<T>> finisher() {
+        return ImmutableList.Builder::build;
+      }
+
+      public Set<Characteristics> characteristics() {
+        return Collections.emptySet();
+      }
+    };
   }
 
   //~ Inner Classes ----------------------------------------------------------

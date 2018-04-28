@@ -171,16 +171,14 @@ public class PigAdapterTest extends AbstractPigTest {
    * generated to implement a query. */
   @SuppressWarnings("rawtypes")
   private static Function<List, Void> pigScriptChecker(final String... strings) {
-    return new Function<List, Void>() {
-      public Void apply(List actual) {
-        String actualArray =
-            actual == null || actual.isEmpty()
-                ? null
-                : (String) actual.get(0);
-        assertEquals("expected Pig script not found",
-            strings[0], actualArray);
-        return null;
-      }
+    return actual -> {
+      String actualArray =
+          actual == null || actual.isEmpty()
+              ? null
+              : (String) actual.get(0);
+      assertEquals("expected Pig script not found",
+          strings[0], actualArray);
+      return null;
     };
   }
 }

@@ -154,20 +154,17 @@ public class SqlCallBinding extends SqlOperatorBinding {
    * formal parameters of the function. */
   private List<SqlNode> permutedOperands(final SqlCall call) {
     final SqlFunction operator = (SqlFunction) call.getOperator();
-    return Lists.transform(operator.getParamNames(),
-        new Function<String, SqlNode>() {
-          public SqlNode apply(String paramName) {
-            for (SqlNode operand2 : call.getOperandList()) {
-              final SqlCall call2 = (SqlCall) operand2;
-              assert operand2.getKind() == SqlKind.ARGUMENT_ASSIGNMENT;
-              final SqlIdentifier id = call2.operand(1);
-              if (id.getSimple().equals(paramName)) {
-                return call2.operand(0);
-              }
-            }
-            return DEFAULT_CALL;
-          }
-        });
+    return Lists.transform(operator.getParamNames(), paramName -> {
+      for (SqlNode operand2 : call.getOperandList()) {
+        final SqlCall call2 = (SqlCall) operand2;
+        assert operand2.getKind() == SqlKind.ARGUMENT_ASSIGNMENT;
+        final SqlIdentifier id = call2.operand(1);
+        if (id.getSimple().equals(paramName)) {
+          return call2.operand(0);
+        }
+      }
+      return DEFAULT_CALL;
+    });
   }
 
   /**

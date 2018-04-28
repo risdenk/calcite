@@ -269,11 +269,8 @@ public class RexShuttle implements RexVisitor<RexNode> {
    * Applies this shuttle to each expression in an iterable.
    */
   public final Iterable<RexNode> apply(Iterable<? extends RexNode> iterable) {
-    return Iterables.transform(iterable, new Function<RexNode, RexNode>() {
-      public RexNode apply(@Nullable RexNode t) {
-        return t == null ? null : t.accept(RexShuttle.this);
-      }
-    });
+    return Iterables.transform(iterable,
+        t -> t == null ? null : t.accept(RexShuttle.this));
   }
 
   /**

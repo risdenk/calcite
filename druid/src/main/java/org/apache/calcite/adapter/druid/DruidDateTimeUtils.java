@@ -86,29 +86,26 @@ public class DruidDateTimeUtils {
 
   protected static List<Interval> toInterval(
       List<Range<TimestampString>> ranges) {
-    List<Interval> intervals = Lists.transform(ranges,
-        new Function<Range<TimestampString>, Interval>() {
-          public Interval apply(Range<TimestampString> range) {
-            if (!range.hasLowerBound() && !range.hasUpperBound()) {
-              return DruidTable.DEFAULT_INTERVAL;
-            }
-            long start = range.hasLowerBound()
-                ? range.lowerEndpoint().getMillisSinceEpoch()
-                : DruidTable.DEFAULT_INTERVAL.getStartMillis();
-            long end = range.hasUpperBound()
-                ? range.upperEndpoint().getMillisSinceEpoch()
-                : DruidTable.DEFAULT_INTERVAL.getEndMillis();
-            if (range.hasLowerBound()
-                && range.lowerBoundType() == BoundType.OPEN) {
-              start++;
-            }
-            if (range.hasUpperBound()
-                && range.upperBoundType() == BoundType.CLOSED) {
-              end++;
-            }
-            return new Interval(start, end, ISOChronology.getInstanceUTC());
-          }
-        });
+    List<Interval> intervals = Lists.transform(ranges, range -> {
+      if (!range.hasLowerBound() && !range.hasUpperBound()) {
+        return DruidTable.DEFAULT_INTERVAL;
+      }
+      long start = range.hasLowerBound()
+          ? range.lowerEndpoint().getMillisSinceEpoch()
+          : DruidTable.DEFAULT_INTERVAL.getStartMillis();
+      long end = range.hasUpperBound()
+          ? range.upperEndpoint().getMillisSinceEpoch()
+          : DruidTable.DEFAULT_INTERVAL.getEndMillis();
+      if (range.hasLowerBound()
+          && range.lowerBoundType() == BoundType.OPEN) {
+        start++;
+      }
+      if (range.hasUpperBound()
+          && range.upperBoundType() == BoundType.CLOSED) {
+        end++;
+      }
+      return new Interval(start, end, ISOChronology.getInstanceUTC());
+    });
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Converted time ranges " + ranges + " to interval " + intervals);
     }

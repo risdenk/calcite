@@ -251,48 +251,23 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
     }
 
     public Sql expand(final boolean b) {
-      return withTransform(
-          new Function<Tester, Tester>() {
-            public Tester apply(Tester tester) {
-              return tester.withExpand(b);
-            }
-          });
+      return withTransform(tester -> tester.withExpand(b));
     }
 
     public Sql withLateDecorrelation(final boolean b) {
-      return withTransform(
-          new Function<Tester, Tester>() {
-            public Tester apply(Tester tester) {
-              return tester.withLateDecorrelation(b);
-            }
-          });
+      return withTransform(tester -> tester.withLateDecorrelation(b));
     }
 
     public Sql withDecorrelation(final boolean b) {
-      return withTransform(
-          new Function<Tester, Tester>() {
-            public Tester apply(Tester tester) {
-              return tester.withDecorrelation(b);
-            }
-          });
+      return withTransform(tester -> tester.withDecorrelation(b));
     }
 
     public Sql withTrim(final boolean b) {
-      return withTransform(
-          new Function<Tester, Tester>() {
-            public Tester apply(Tester tester) {
-              return tester.withTrim(b);
-            }
-          });
+      return withTransform(tester -> tester.withTrim(b));
     }
 
     public Sql withContext(final Context context) {
-      return withTransform(
-          new Function<Tester, Tester>() {
-            public Tester apply(Tester tester) {
-              return tester.withContext(context);
-            }
-          });
+      return withTransform(tester -> tester.withContext(context));
     }
 
     public void check() {

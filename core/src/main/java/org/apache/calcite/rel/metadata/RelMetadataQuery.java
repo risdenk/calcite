@@ -146,13 +146,9 @@ public class RelMetadataQuery {
   protected static <H> H initialHandler(Class<H> handlerClass) {
     return handlerClass.cast(
         Proxy.newProxyInstance(RelMetadataQuery.class.getClassLoader(),
-            new Class[] {handlerClass},
-            new InvocationHandler() {
-              public Object invoke(Object proxy, Method method, Object[] args)
-                  throws Throwable {
-                final RelNode r = (RelNode) args[0];
-                throw new JaninoRelMetadataProvider.NoHandler(r.getClass());
-              }
+            new Class[] {handlerClass}, (proxy, method, args) -> {
+              final RelNode r = (RelNode) args[0];
+              throw new JaninoRelMetadataProvider.NoHandler(r.getClass());
             }));
   }
 

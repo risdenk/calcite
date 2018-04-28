@@ -63,13 +63,10 @@ public class SqlAdvisorGetHintsFunction
 
   private static final CallImplementor IMPLEMENTOR =
       RexImpTable.createImplementor(
-          new NotNullImplementor() {
-            public Expression implement(RexToLixTranslator translator,
-                RexCall call, List<Expression> operands) {
-              return Expressions.call(GET_COMPLETION_HINTS,
-                  Iterables.concat(Collections.singleton(ADVISOR), operands));
-            }
-          }, NullPolicy.ANY, false);
+          (translator, call, operands) ->
+              Expressions.call(GET_COMPLETION_HINTS,
+                  Iterables.concat(Collections.singleton(ADVISOR), operands)),
+          NullPolicy.ANY, false);
 
   private static final List<FunctionParameter> PARAMETERS =
       ReflectiveFunctionBase.builder()

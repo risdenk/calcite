@@ -542,16 +542,13 @@ public abstract class SqlUtil {
                 }
                 map.put(i, argName.i);
               }
-              permutedArgTypes = Functions.generate(paramTypes.size(),
-                  new Function1<Integer, RelDataType>() {
-                    public RelDataType apply(Integer a0) {
-                      if (map.containsKey(a0)) {
-                        return argTypes.get(map.get(a0));
-                      } else {
-                        return null;
-                      }
-                    }
-                  });
+              permutedArgTypes = Functions.generate(paramTypes.size(), a0 -> {
+                if (map.containsKey(a0)) {
+                  return argTypes.get(map.get(a0));
+                } else {
+                  return null;
+                }
+              });
             } else {
               permutedArgTypes = Lists.newArrayList(argTypes);
               while (permutedArgTypes.size() < argTypes.size()) {

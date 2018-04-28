@@ -144,12 +144,7 @@ public class CassandraToEnumerableConverter
   /** E.g. {@code constantList("x", "y")} returns
    * {@code {ConstantExpression("x"), ConstantExpression("y")}}. */
   private static <T> List<Expression> constantList(List<T> values) {
-    return Lists.transform(values,
-        new Function<T, Expression>() {
-          public Expression apply(T a0) {
-            return Expressions.constant(a0);
-          }
-        });
+    return Lists.transform(values, Expressions::constant);
   }
 }
 

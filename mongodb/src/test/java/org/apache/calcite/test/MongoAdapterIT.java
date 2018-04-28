@@ -123,16 +123,14 @@ public class MongoAdapterIT {
   /** Returns a function that checks that a particular MongoDB pipeline is
    * generated to implement a query. */
   private static Function<List, Void> mongoChecker(final String... strings) {
-    return new Function<List, Void>() {
-      public Void apply(List actual) {
-        Object[] actualArray =
-            actual == null || actual.isEmpty()
-                ? null
-                : ((List) actual.get(0)).toArray();
-        CalciteAssert.assertArrayEqual("expected MongoDB query not found",
-            strings, actualArray);
-        return null;
-      }
+    return actual -> {
+      Object[] actualArray =
+          actual == null || actual.isEmpty()
+              ? null
+              : ((List) actual.get(0)).toArray();
+      CalciteAssert.assertArrayEqual("expected MongoDB query not found",
+          strings, actualArray);
+      return null;
     };
   }
 
@@ -140,27 +138,25 @@ public class MongoAdapterIT {
    * before comparing them. */
   static Function<ResultSet, Void> checkResultUnordered(
       final String... lines) {
-    return new Function<ResultSet, Void>() {
-      public Void apply(ResultSet resultSet) {
-        try {
-          final List<String> expectedList =
-              Ordering.natural().immutableSortedCopy(Arrays.asList(lines));
+    return resultSet -> {
+      try {
+        final List<String> expectedList =
+            Ordering.natural().immutableSortedCopy(Arrays.asList(lines));
 
-          final List<String> actualList = Lists.newArrayList();
-          CalciteAssert.toStringList(resultSet, actualList);
-          for (int i = 0; i < actualList.size(); i++) {
-            String s = actualList.get(i);
-            actualList.set(i,
-                s.replaceAll("\\.0;", ";").replaceAll("\\.0$", ""));
-          }
-          Collections.sort(actualList);
-
-          assertThat(Ordering.natural().immutableSortedCopy(actualList),
-              equalTo(expectedList));
-          return null;
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
+        final List<String> actualList = Lists.newArrayList();
+        CalciteAssert.toStringList(resultSet, actualList);
+        for (int i = 0; i < actualList.size(); i++) {
+          String s = actualList.get(i);
+          actualList.set(i,
+              s.replaceAll("\\.0;", ";").replaceAll("\\.0$", ""));
         }
+        Collections.sort(actualList);
+
+        assertThat(Ordering.natural().immutableSortedCopy(actualList),
+            equalTo(expectedList));
+        return null;
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
       }
     };
   }
@@ -827,18 +823,15 @@ public class MongoAdapterIT {
         .enable(enabled())
         .with(ZIPS)
         .query("select count(*) from zips")
-        .returns(
-            new Function<ResultSet, Void>() {
-              public Void apply(ResultSet input) {
-                try {
-                  assertThat(input.next(), CoreMatchers.is(true));
-                  assertThat(input.getInt(1), CoreMatchers.is(29353));
-                  return null;
-                } catch (SQLException e) {
-                  throw new RuntimeException(e);
-                }
-              }
-            });
+        .returns(input -> {
+          try {
+            assertThat(input.next(), CoreMatchers.is(true));
+            assertThat(input.getInt(1), CoreMatchers.is(29353));
+            return null;
+          } catch (SQLException e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 }
 

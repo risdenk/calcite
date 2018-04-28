@@ -66,11 +66,7 @@ public class RelMdColumnUniqueness
 
   /** Aggregate and Calc are "safe" children of a RelSubset to delve into. */
   private static final Predicate<RelNode> SAFE_REL =
-      new PredicateImpl<RelNode>() {
-        public boolean test(RelNode r) {
-          return r instanceof Aggregate || r instanceof Project;
-        }
-      };
+      r -> r instanceof Aggregate || r instanceof Project;
 
   //~ Constructors -----------------------------------------------------------
 

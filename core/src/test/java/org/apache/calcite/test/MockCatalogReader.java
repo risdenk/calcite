@@ -1478,14 +1478,7 @@ public class MockCatalogReader extends CalciteCatalogReader {
         if (subMap != null) {
           List<Map.Entry<String, Integer>> entries =
               new ArrayList<>(subMap.entrySet());
-          Collections.sort(
-              entries,
-              new Comparator<Map.Entry<String, Integer>>() {
-                @Override public int compare(
-                    Entry<String, Integer> o1, Entry<String, Integer> o2) {
-                  return o1.getValue() - o2.getValue();
-                }
-              });
+          entries.sort((o1, o2) -> o1.getValue() - o2.getValue());
           ret.add(
               new Pair<RelDataTypeField, List<String>>(
                   new RelDataTypeFieldImpl(
@@ -1575,8 +1568,7 @@ public class MockCatalogReader extends CalciteCatalogReader {
     }
 
     @Override public boolean rolledUpColumnValidInsideAgg(String column,
-                                                          SqlCall call, SqlNode parent,
-                                                          CalciteConnectionConfig config) {
+        SqlCall call, SqlNode parent, CalciteConnectionConfig config) {
       // For testing
       return call.getKind() != SqlKind.MAX
               && (parent.getKind() == SqlKind.SELECT || parent.getKind() == SqlKind.FILTER);

@@ -193,15 +193,12 @@ public class Bindables {
       final Table table = relOptTable.unwrap(Table.class);
       final RelTraitSet traitSet =
           cluster.traitSetOf(BindableConvention.INSTANCE)
-              .replaceIfs(RelCollationTraitDef.INSTANCE,
-                  new Supplier<List<RelCollation>>() {
-                    public List<RelCollation> get() {
-                      if (table != null) {
-                        return table.getStatistic().getCollations();
-                      }
-                      return ImmutableList.of();
-                    }
-                  });
+              .replaceIfs(RelCollationTraitDef.INSTANCE, () -> {
+                if (table != null) {
+                  return table.getStatistic().getCollations();
+                }
+                return ImmutableList.of();
+              });
       return new BindableTableScan(cluster, traitSet, relOptTable,
           ImmutableList.copyOf(filters), ImmutableIntList.copyOf(projects));
     }
@@ -299,11 +296,7 @@ public class Bindables {
       final RelTraitSet traitSet =
           cluster.traitSetOf(BindableConvention.INSTANCE)
               .replaceIfs(RelCollationTraitDef.INSTANCE,
-                  new Supplier<List<RelCollation>>() {
-                    public List<RelCollation> get() {
-                      return RelMdCollation.filter(mq, input);
-                    }
-                  });
+                  () -> RelMdCollation.filter(mq, input));
       return new BindableFilter(cluster, traitSet, input, condition);
     }
 

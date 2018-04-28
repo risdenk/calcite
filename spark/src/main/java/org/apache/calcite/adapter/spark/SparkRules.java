@@ -396,27 +396,13 @@ public abstract class SparkRules {
     final JavaSparkContext sc = new JavaSparkContext("local[1]", "calcite");
     final JavaRDD<String> file = sc.textFile("/usr/share/dict/words");
     System.out.println(
-        file.map(
-            new Function<String, Object>() {
-              @Override public Object call(String s) throws Exception {
-                return s.substring(0, Math.min(s.length(), 1));
-              }
-            }).distinct().count());
+        file.map((Function<String, Object>) s -> s.substring(0, Math.min(s.length(), 1))).distinct().count());
     file.cache();
     String s =
-        file.groupBy(
-            new Function<String, String>() {
-              @Override public String call(String s) throws Exception {
-                return s.substring(0, Math.min(s.length(), 1));
-              }
-            }
+        file.groupBy((Function<String, String>) s1 -> s1.substring(0, Math.min(s1.length(), 1))
             //CHECKSTYLE: IGNORE 1
-        ).map(
-            new Function<Tuple2<String, Iterable<String>>, Object>() {
-              @Override public Object call(Tuple2<String, Iterable<String>> pair) {
-                return pair._1() + ":" + Iterables.size(pair._2());
-              }
-            }).collect().toString();
+        ).map((Function<Tuple2<String, Iterable<String>>, Object>) pair ->
+            pair._1() + ":" + Iterables.size(pair._2())).collect().toString();
     System.out.print(s);
 
     final JavaRDD<Integer> rdd = sc.parallelize(
@@ -433,23 +419,15 @@ public abstract class SparkRules {
           }
         });
     System.out.println(
-        rdd.groupBy(
-            new Function<Integer, Integer>() {
-              public Integer call(Integer integer) {
-                return integer % 2;
-              }
-            }).collect().toString());
+        rdd.groupBy((Function<Integer, Integer>) integer -> integer % 2).collect().toString());
     System.out.println(
-        file.flatMap(
-            new FlatMapFunction<String, Pair<String, Integer>>() {
-              public Iterator<Pair<String, Integer>> call(String x) {
-                if (!x.startsWith("a")) {
-                  return Collections.emptyIterator();
-                }
-                return Collections.singletonList(
-                    Pair.of(x.toUpperCase(Locale.ROOT), x.length())).iterator();
-              }
-            })
+        file.flatMap((FlatMapFunction<String, Pair<String, Integer>>) x -> {
+          if (!x.startsWith("a")) {
+            return Collections.emptyIterator();
+          }
+          return Collections.singletonList(
+              Pair.of(x.toUpperCase(Locale.ROOT), x.length())).iterator();
+        })
             .take(5)
             .toString());
   }

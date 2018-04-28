@@ -176,17 +176,14 @@ public class DruidRules {
       }
 
       // Timestamp
-      int timestampFieldIdx = Iterables
-          .indexOf(query.getRowType().getFieldList(), new Predicate<RelDataTypeField>() {
-            @Override public boolean apply(@Nullable RelDataTypeField input) {
-              return query.druidTable.timestampFieldName.equals(input.getName());
-            }
-          });
+      int timestampFieldIdx =
+          query.getRowType().getFieldNames()
+              .indexOf(query.druidTable.timestampFieldName);
       RelNode newDruidQuery = query;
       final Triple<List<RexNode>, List<RexNode>, List<RexNode>> triple =
           splitFilters(rexBuilder, query, validPreds, nonValidPreds, timestampFieldIdx);
       if (triple.getLeft().isEmpty() && triple.getMiddle().isEmpty()) {
-        //it sucks, nothing to push
+        // it sucks, nothing to push
         return;
       }
       final List<RexNode> residualPreds = new ArrayList<>(triple.getRight());

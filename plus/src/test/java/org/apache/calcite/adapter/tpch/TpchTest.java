@@ -831,14 +831,11 @@ public class TpchTest {
   @Test public void testQuery02Conversion() {
     query(2, true)
         .enable(ENABLE)
-        .convertMatches(
-          new Function<RelNode, Void>() {
-            public Void apply(RelNode relNode) {
-              String s = RelOptUtil.toString(relNode);
-              assertThat(s, not(containsString("Correlator")));
-              return null;
-            }
-          });
+        .convertMatches(relNode -> {
+          String s = RelOptUtil.toString(relNode);
+          assertThat(s, not(containsString("Correlator")));
+          return null;
+        });
   }
 
   @Test public void testQuery03() {

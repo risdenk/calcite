@@ -45,7 +45,6 @@ import org.apache.calcite.util.Util;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -66,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Predicate;
 
 /**
  * Collection of planner rules that convert
@@ -92,17 +92,15 @@ public abstract class DateRangeRules {
   private DateRangeRules() {}
 
   private static final Predicate<Filter> FILTER_PREDICATE =
-      new PredicateImpl<Filter>() {
-        @Override public boolean test(Filter filter) {
-          try (ExtractFinder finder = ExtractFinder.THREAD_INSTANCES.get()) {
-            assert finder.timeUnits.isEmpty() && finder.opKinds.isEmpty()
-                : "previous user did not clean up";
-            filter.getCondition().accept(finder);
-            // bail out if there is no EXTRACT of YEAR, or call to FLOOR or CEIL
-            return finder.timeUnits.contains(TimeUnitRange.YEAR)
-                || finder.opKinds.contains(SqlKind.FLOOR)
-                || finder.opKinds.contains(SqlKind.CEIL);
-          }
+      filter -> {
+        try (ExtractFinder finder = ExtractFinder.THREAD_INSTANCES.get()) {
+          assert finder.timeUnits.isEmpty() && finder.opKinds.isEmpty()
+              : "previous user did not clean up";
+          filter.getCondition().accept(finder);
+          // bail out if there is no EXTRACT of YEAR, or call to FLOOR or CEIL
+          return finder.timeUnits.contains(TimeUnitRange.YEAR)
+              || finder.opKinds.contains(SqlKind.FLOOR)
+              || finder.opKinds.contains(SqlKind.CEIL);
         }
       };
 
@@ -174,7 +172,7 @@ public abstract class DateRangeRules {
   @SuppressWarnings("WeakerAccess")
   public static class FilterDateRangeRule extends RelOptRule {
     public FilterDateRangeRule(RelBuilderFactory relBuilderFactory) {
-      super(operand(Filter.class, null, FILTER_PREDICATE, any()),
+      super(operandJ(Filter.class, null, FILTER_PREDICATE, any()),
           relBuilderFactory, "FilterDateRangeRule");
     }
 
@@ -205,11 +203,7 @@ public abstract class DateRangeRules {
     private final Set<SqlKind> opKinds = EnumSet.noneOf(SqlKind.class);
 
     private static final ThreadLocal<ExtractFinder> THREAD_INSTANCES =
-        new ThreadLocal<ExtractFinder>() {
-          @Override protected ExtractFinder initialValue() {
-            return new ExtractFinder();
-          }
-        };
+        ThreadLocal.withInitial(ExtractFinder::new);
 
     private ExtractFinder() {
       super(true);

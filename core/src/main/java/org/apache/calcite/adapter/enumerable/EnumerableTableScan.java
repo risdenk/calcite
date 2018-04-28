@@ -76,15 +76,12 @@ public class EnumerableTableScan
     Class elementType = EnumerableTableScan.deduceElementType(table);
     final RelTraitSet traitSet =
         cluster.traitSetOf(EnumerableConvention.INSTANCE)
-            .replaceIfs(RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    if (table != null) {
-                      return table.getStatistic().getCollations();
-                    }
-                    return ImmutableList.of();
-                  }
-                });
+            .replaceIfs(RelCollationTraitDef.INSTANCE, () -> {
+              if (table != null) {
+                return table.getStatistic().getCollations();
+              }
+              return ImmutableList.of();
+            });
     return new EnumerableTableScan(cluster, traitSet, relOptTable, elementType);
   }
 

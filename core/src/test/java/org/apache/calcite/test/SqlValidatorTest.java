@@ -5989,13 +5989,10 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
    * lurking in the validation process.
    */
   @Test public void testLarge() {
-    checkLarge(700,
-        new Function<String, Void>() {
-          public Void apply(String input) {
-            check(input);
-            return null;
-          }
-        });
+    checkLarge(700, input -> {
+      check(input);
+      return null;
+    });
   }
 
   static void checkLarge(int x, Function<String, Void> f) {
@@ -8533,20 +8530,17 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
    * the documentation</a>. */
   @Test public void testOperatorsSortedByPrecedence() {
     final StringBuilder b = new StringBuilder();
-    final Comparator<SqlOperator> comparator =
-        new Comparator<SqlOperator>() {
-          public int compare(SqlOperator o1, SqlOperator o2) {
-            int c = Integer.compare(prec(o1), prec(o2));
-            if (c != 0) {
-              return -c;
-            }
-            c = o1.getName().compareTo(o2.getName());
-            if (c != 0) {
-              return c;
-            }
-            return o1.getSyntax().compareTo(o2.getSyntax());
-          }
-        };
+    final Comparator<SqlOperator> comparator = (o1, o2) -> {
+      int c = Integer.compare(prec(o1), prec(o2));
+      if (c != 0) {
+        return -c;
+      }
+      c = o1.getName().compareTo(o2.getName());
+      if (c != 0) {
+        return c;
+      }
+      return o1.getSyntax().compareTo(o2.getSyntax());
+    };
     final List<SqlOperator> operators =
         SqlStdOperatorTable.instance().getOperatorList();
     int p = -1;

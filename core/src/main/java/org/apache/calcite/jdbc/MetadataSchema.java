@@ -39,12 +39,8 @@ class MetadataSchema extends AbstractSchema {
             public Enumerator<MetaColumn> enumerator(
                 final CalciteMetaImpl meta) {
               final String catalog = meta.getConnection().getCatalog();
-              return meta.tables(catalog).selectMany(
-                  new Function1<MetaTable, Enumerable<MetaColumn>>() {
-                    public Enumerable<MetaColumn> apply(MetaTable table) {
-                      return meta.columns(table);
-                    }
-                  }).enumerator();
+              return meta.tables(catalog)
+                  .selectMany(meta::columns).enumerator();
             }
           },
           "TABLES",

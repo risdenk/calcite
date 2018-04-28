@@ -71,15 +71,13 @@ public class EnumerableBindable extends ConverterImpl implements BindableRel {
   }
 
   public Node implement(final InterpreterImplementor implementor) {
-    return new Node() {
-      public void run() throws InterruptedException {
-        final Sink sink =
-            implementor.relSinks.get(EnumerableBindable.this).get(0);
-        final Enumerable<Object[]> enumerable = bind(implementor.dataContext);
-        final Enumerator<Object[]> enumerator = enumerable.enumerator();
-        while (enumerator.moveNext()) {
-          sink.send(Row.asCopy(enumerator.current()));
-        }
+    return () -> {
+      final Sink sink =
+          implementor.relSinks.get(EnumerableBindable.this).get(0);
+      final Enumerable<Object[]> enumerable = bind(implementor.dataContext);
+      final Enumerator<Object[]> enumerator = enumerable.enumerator();
+      while (enumerator.moveNext()) {
+        sink.send(Row.asCopy(enumerator.current()));
       }
     };
   }

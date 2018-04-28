@@ -66,8 +66,8 @@ import java.util.Set;
 public abstract class SubQueryRemoveRule extends RelOptRule {
   public static final SubQueryRemoveRule PROJECT =
       new SubQueryRemoveRule(
-          operand(Project.class, null, RexUtil.SubQueryFinder.PROJECT_PREDICATE,
-              any()),
+          operandJ(Project.class, null,
+              RexUtil.SubQueryFinder::containsSubQuery, any()),
           RelFactories.LOGICAL_BUILDER, "SubQueryRemoveRule:Project") {
         public void onMatch(RelOptRuleCall call) {
           final Project project = call.rel(0);
@@ -91,8 +91,8 @@ public abstract class SubQueryRemoveRule extends RelOptRule {
 
   public static final SubQueryRemoveRule FILTER =
       new SubQueryRemoveRule(
-          operand(Filter.class, null, RexUtil.SubQueryFinder.FILTER_PREDICATE,
-              any()),
+          operandJ(Filter.class, null,
+              RexUtil.SubQueryFinder::containsSubQuery, any()),
           RelFactories.LOGICAL_BUILDER, "SubQueryRemoveRule:Filter") {
         public void onMatch(RelOptRuleCall call) {
           final Filter filter = call.rel(0);
@@ -125,8 +125,9 @@ public abstract class SubQueryRemoveRule extends RelOptRule {
 
   public static final SubQueryRemoveRule JOIN =
       new SubQueryRemoveRule(
-          operand(Join.class, null, RexUtil.SubQueryFinder.JOIN_PREDICATE,
-              any()), RelFactories.LOGICAL_BUILDER, "SubQueryRemoveRule:Join") {
+          operandJ(Join.class, null, RexUtil.SubQueryFinder::containsSubQuery,
+              any()),
+          RelFactories.LOGICAL_BUILDER, "SubQueryRemoveRule:Join") {
         public void onMatch(RelOptRuleCall call) {
           final Join join = call.rel(0);
           final RelBuilder builder = call.builder();

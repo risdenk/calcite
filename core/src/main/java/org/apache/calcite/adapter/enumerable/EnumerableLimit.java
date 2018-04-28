@@ -71,17 +71,9 @@ public class EnumerableLimit extends SingleRel implements EnumerableRel {
         cluster.traitSetOf(EnumerableConvention.INSTANCE)
             .replaceIfs(
                 RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    return RelMdCollation.limit(mq, input);
-                  }
-                })
+                () -> RelMdCollation.limit(mq, input))
             .replaceIf(RelDistributionTraitDef.INSTANCE,
-                new Supplier<RelDistribution>() {
-                  public RelDistribution get() {
-                    return RelMdDistribution.limit(mq, input);
-                  }
-                });
+                () -> RelMdDistribution.limit(mq, input));
     return new EnumerableLimit(cluster, traitSet, input, offset, fetch);
   }
 

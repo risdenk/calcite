@@ -95,17 +95,9 @@ public class EnumerableCalc extends Calc implements EnumerableRel {
     final RelTraitSet traitSet = cluster.traitSet()
         .replace(EnumerableConvention.INSTANCE)
         .replaceIfs(RelCollationTraitDef.INSTANCE,
-            new Supplier<List<RelCollation>>() {
-              public List<RelCollation> get() {
-                return RelMdCollation.calc(mq, input, program);
-              }
-            })
+            () -> RelMdCollation.calc(mq, input, program))
         .replaceIf(RelDistributionTraitDef.INSTANCE,
-            new Supplier<RelDistribution>() {
-              public RelDistribution get() {
-                return RelMdDistribution.calc(mq, input, program);
-              }
-            });
+            () -> RelMdDistribution.calc(mq, input, program));
     return new EnumerableCalc(cluster, traitSet, input, program);
   }
 

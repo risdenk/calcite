@@ -49,12 +49,7 @@ public class HttpUtils {
       HttpsURLConnection httpsConn = (HttpsURLConnection) httpConn;
       httpsConn.setSSLSocketFactory(
           TrustAllSslSocketFactory.createSSLSocketFactory());
-      httpsConn.setHostnameVerifier(
-          new HostnameVerifier() {
-            public boolean verify(String arg0, SSLSession arg1) {
-              return true;
-            }
-          });
+      httpsConn.setHostnameVerifier((arg0, arg1) -> true);
     }
 
     return httpConn;

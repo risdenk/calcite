@@ -110,17 +110,9 @@ public final class LogicalFilter extends Filter {
     final RelMetadataQuery mq = cluster.getMetadataQuery();
     final RelTraitSet traitSet = cluster.traitSetOf(Convention.NONE)
         .replaceIfs(RelCollationTraitDef.INSTANCE,
-            new Supplier<List<RelCollation>>() {
-              public List<RelCollation> get() {
-                return RelMdCollation.filter(mq, input);
-              }
-            })
+            () -> RelMdCollation.filter(mq, input))
         .replaceIf(RelDistributionTraitDef.INSTANCE,
-            new Supplier<RelDistribution>() {
-              public RelDistribution get() {
-                return RelMdDistribution.filter(mq, input);
-              }
-            });
+            () -> RelMdDistribution.filter(mq, input));
     return new LogicalFilter(cluster, traitSet, input, condition, variablesSet);
   }
 

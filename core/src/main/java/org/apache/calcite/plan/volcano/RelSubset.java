@@ -387,18 +387,9 @@ public class RelSubset extends AbstractRelNode {
    * @return all the rels in the subset
    */
   public Iterable<RelNode> getRels() {
-    return new Iterable<RelNode>() {
-      public Iterator<RelNode> iterator() {
-        return Linq4j.asEnumerable(set.rels)
-            .where(
-                new Predicate1<RelNode>() {
-                  public boolean apply(RelNode v1) {
-                    return v1.getTraitSet().satisfies(traitSet);
-                  }
-                })
-            .iterator();
-      }
-    };
+    return () -> Linq4j.asEnumerable(set.rels)
+        .where(v1 -> v1.getTraitSet().satisfies(traitSet))
+        .iterator();
   }
 
   /**

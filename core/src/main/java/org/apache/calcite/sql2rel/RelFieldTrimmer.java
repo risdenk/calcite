@@ -848,11 +848,7 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
     final ImmutableList<ImmutableBitSet> newGroupSets =
         ImmutableList.copyOf(
             Iterables.transform(aggregate.getGroupSets(),
-                new Function<ImmutableBitSet, ImmutableBitSet>() {
-                  public ImmutableBitSet apply(ImmutableBitSet input) {
-                    return Mappings.apply(inputMapping, input);
-                  }
-                }));
+                input1 -> Mappings.apply(inputMapping, input1)));
 
     // Populate mapping of where to find the fields. System, group key and
     // indicator fields first.

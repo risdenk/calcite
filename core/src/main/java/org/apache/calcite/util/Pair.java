@@ -229,27 +229,25 @@ public class Pair<T1, T2>
   public static <K, V> Iterable<Pair<K, V>> zip(
       final Iterable<? extends K> ks,
       final Iterable<? extends V> vs) {
-    return new Iterable<Pair<K, V>>() {
-      public Iterator<Pair<K, V>> iterator() {
-        final Iterator<? extends K> kIterator = ks.iterator();
-        final Iterator<? extends V> vIterator = vs.iterator();
+    return () -> {
+      final Iterator<? extends K> kIterator = ks.iterator();
+      final Iterator<? extends V> vIterator = vs.iterator();
 
-        return new Iterator<Pair<K, V>>() {
-          public boolean hasNext() {
-            return kIterator.hasNext() && vIterator.hasNext();
-          }
+      return new Iterator<Pair<K, V>>() {
+        public boolean hasNext() {
+          return kIterator.hasNext() && vIterator.hasNext();
+        }
 
-          @SuppressWarnings("unchecked")
-          public Pair<K, V> next() {
-            return (Pair<K, V>) Pair.of(kIterator.next(), vIterator.next());
-          }
+        @SuppressWarnings("unchecked")
+        public Pair<K, V> next() {
+          return (Pair<K, V>) Pair.of(kIterator.next(), vIterator.next());
+        }
 
-          public void remove() {
-            kIterator.remove();
-            vIterator.remove();
-          }
-        };
-      }
+        public void remove() {
+          kIterator.remove();
+          vIterator.remove();
+        }
+      };
     };
   }
 
@@ -288,24 +286,22 @@ public class Pair<T1, T2>
    */
   public static <L, R> Iterable<L> left(
       final Iterable<? extends Map.Entry<L, R>> iterable) {
-    return new Iterable<L>() {
-      public Iterator<L> iterator() {
-        final Iterator<? extends Map.Entry<L, R>> iterator =
-            iterable.iterator();
-        return new Iterator<L>() {
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
+    return () -> {
+      final Iterator<? extends Map.Entry<L, R>> iterator =
+          iterable.iterator();
+      return new Iterator<L>() {
+        public boolean hasNext() {
+          return iterator.hasNext();
+        }
 
-          public L next() {
-            return iterator.next().getKey();
-          }
+        public L next() {
+          return iterator.next().getKey();
+        }
 
-          public void remove() {
-            iterator.remove();
-          }
-        };
-      }
+        public void remove() {
+          iterator.remove();
+        }
+      };
     };
   }
 
@@ -319,24 +315,22 @@ public class Pair<T1, T2>
    */
   public static <L, R> Iterable<R> right(
       final Iterable<? extends Map.Entry<L, R>> iterable) {
-    return new Iterable<R>() {
-      public Iterator<R> iterator() {
-        final Iterator<? extends Map.Entry<L, R>> iterator =
-            iterable.iterator();
-        return new Iterator<R>() {
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
+    return () -> {
+      final Iterator<? extends Map.Entry<L, R>> iterator =
+          iterable.iterator();
+      return new Iterator<R>() {
+        public boolean hasNext() {
+          return iterator.hasNext();
+        }
 
-          public R next() {
-            return iterator.next().getValue();
-          }
+        public R next() {
+          return iterator.next().getValue();
+        }
 
-          public void remove() {
-            iterator.remove();
-          }
-        };
-      }
+        public void remove() {
+          iterator.remove();
+        }
+      };
     };
   }
 
@@ -376,32 +370,30 @@ public class Pair<T1, T2>
    * @return Iterable over adjacent element pairs
    */
   public static <T> Iterable<Pair<T, T>> adjacents(final Iterable<T> iterable) {
-    return new Iterable<Pair<T, T>>() {
-      public Iterator<Pair<T, T>> iterator() {
-        final Iterator<T> iterator = iterable.iterator();
-        if (!iterator.hasNext()) {
-          return Collections.emptyIterator();
-        }
-        final T first = iterator.next();
-        return new Iterator<Pair<T, T>>() {
-          T previous = first;
-
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
-
-          public Pair<T, T> next() {
-            final T current = iterator.next();
-            final Pair<T, T> pair = of(previous, current);
-            previous = current;
-            return pair;
-          }
-
-          public void remove() {
-            throw new UnsupportedOperationException("remove");
-          }
-        };
+    return () -> {
+      final Iterator<T> iterator = iterable.iterator();
+      if (!iterator.hasNext()) {
+        return Collections.emptyIterator();
       }
+      final T first = iterator.next();
+      return new Iterator<Pair<T, T>>() {
+        T previous = first;
+
+        public boolean hasNext() {
+          return iterator.hasNext();
+        }
+
+        public Pair<T, T> next() {
+          final T current = iterator.next();
+          final Pair<T, T> pair = of(previous, current);
+          previous = current;
+          return pair;
+        }
+
+        public void remove() {
+          throw new UnsupportedOperationException("remove");
+        }
+      };
     };
   }
 
@@ -416,27 +408,25 @@ public class Pair<T1, T2>
    * @return Iterable over pairs of the first element and all other elements
    */
   public static <T> Iterable<Pair<T, T>> firstAnd(final Iterable<T> iterable) {
-    return new Iterable<Pair<T, T>>() {
-      public Iterator<Pair<T, T>> iterator() {
-        final Iterator<T> iterator = iterable.iterator();
-        if (!iterator.hasNext()) {
-          return Collections.emptyIterator();
-        }
-        final T first = iterator.next();
-        return new Iterator<Pair<T, T>>() {
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
-
-          public Pair<T, T> next() {
-            return of(first, iterator.next());
-          }
-
-          public void remove() {
-            throw new UnsupportedOperationException("remove");
-          }
-        };
+    return () -> {
+      final Iterator<T> iterator = iterable.iterator();
+      if (!iterator.hasNext()) {
+        return Collections.emptyIterator();
       }
+      final T first = iterator.next();
+      return new Iterator<Pair<T, T>>() {
+        public boolean hasNext() {
+          return iterator.hasNext();
+        }
+
+        public Pair<T, T> next() {
+          return of(first, iterator.next());
+        }
+
+        public void remove() {
+          throw new UnsupportedOperationException("remove");
+        }
+      };
     };
   }
 }

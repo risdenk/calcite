@@ -127,16 +127,14 @@ final class JdbcUtils {
 
     public static Function1<ResultSet, Function0<Object[]>> factory(
         final List<Pair<ColumnMetaData.Rep, Integer>> list) {
-      return new Function1<ResultSet, Function0<Object[]>>() {
-        public Function0<Object[]> apply(ResultSet resultSet) {
-          try {
-            return new ObjectArrayRowBuilder(
-                resultSet,
-                Pair.left(list).toArray(new ColumnMetaData.Rep[list.size()]),
-                Ints.toArray(Pair.right(list)));
-          } catch (SQLException e) {
-            throw new RuntimeException(e);
-          }
+      return resultSet -> {
+        try {
+          return new ObjectArrayRowBuilder(
+              resultSet,
+              Pair.left(list).toArray(new ColumnMetaData.Rep[list.size()]),
+              Ints.toArray(Pair.right(list)));
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
         }
       };
     }

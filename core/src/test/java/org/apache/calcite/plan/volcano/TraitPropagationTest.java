@@ -329,11 +329,7 @@ public class TraitPropagationTest {
           cluster.traitSet().replace(PHYSICAL)
               .replaceIfs(
                   RelCollationTraitDef.INSTANCE,
-                  new Supplier<List<RelCollation>>() {
-                    public List<RelCollation> get() {
-                      return RelMdCollation.project(mq, input, projects);
-                    }
-                  });
+                  () -> RelMdCollation.project(mq, input, projects));
       return new PhysProj(cluster, traitSet, input, projects, rowType);
     }
 

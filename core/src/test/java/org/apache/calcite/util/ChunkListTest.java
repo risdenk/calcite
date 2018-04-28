@@ -383,22 +383,7 @@ public class ChunkListTest {
     //noinspection unchecked
     final Iterable<Pair<Function0<List<Integer>>, String>> factories0 =
         Pair.zip(
-            Arrays.asList(
-                new Function0<List<Integer>>() {
-                  public List<Integer> apply() {
-                    return new ArrayList<>();
-                  }
-                },
-                new Function0<List<Integer>>() {
-                  public List<Integer> apply() {
-                    return new LinkedList<>();
-                  }
-                },
-                new Function0<List<Integer>>() {
-                  public List<Integer> apply() {
-                    return new ChunkList<>();
-                  }
-                }),
+            Arrays.asList(ArrayList::new, LinkedList::new, ChunkList::new),
             Arrays.asList("ArrayList", "LinkedList", "ChunkList-64"));
     final List<Pair<Function0<List<Integer>>, String>> factories1 =
         new ArrayList<>();
@@ -413,36 +398,30 @@ public class ChunkListTest {
             Arrays.asList("100k", "1m", "10m"));
     for (final Pair<Function0<List<Integer>>, String> pair : factories) {
       new Benchmark(
-          "add 10m values, " + pair.right,
-          new Function1<Benchmark.Statistician, Void>() {
-            public Void apply(Benchmark.Statistician statistician) {
-              final List<Integer> list = pair.left.apply();
-              long start = System.currentTimeMillis();
-              for (int i = 0; i < 10000000; i++) {
-                list.add(1);
-              }
-              statistician.record(start);
-              return null;
+          "add 10m values, " + pair.right, statistician -> {
+            final List<Integer> list = pair.left.apply();
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < 10000000; i++) {
+              list.add(1);
             }
+            statistician.record(start);
+            return null;
           },
           10).run();
     }
     for (final Pair<Function0<List<Integer>>, String> pair : factories) {
       new Benchmark(
-          "iterate over 10m values, " + pair.right,
-          new Function1<Benchmark.Statistician, Void>() {
-            public Void apply(Benchmark.Statistician statistician) {
-              final List<Integer> list = pair.left.apply();
-              list.addAll(Collections.nCopies(10000000, 1));
-              long start = System.currentTimeMillis();
-              int count = 0;
-              for (Integer integer : list) {
-                count += integer;
-              }
-              statistician.record(start);
-              assert count == 10000000;
-              return null;
+          "iterate over 10m values, " + pair.right, statistician -> {
+            final List<Integer> list = pair.left.apply();
+            list.addAll(Collections.nCopies(10000000, 1));
+            long start = System.currentTimeMillis();
+            int count = 0;
+            for (Integer integer : list) {
+              count += integer;
             }
+            statistician.record(start);
+            assert count == 10000000;
+            return null;
           },
           10).run();
     }
@@ -452,23 +431,20 @@ public class ChunkListTest {
           continue;
         }
         new Benchmark(
-            "delete 10% of " + size.right + " values, " + pair.right,
-            new Function1<Benchmark.Statistician, Void>() {
-              public Void apply(Benchmark.Statistician statistician) {
-                final List<Integer> list = pair.left.apply();
-                list.addAll(Collections.nCopies(size.left, 1));
-                long start = System.currentTimeMillis();
-                int n = 0;
-                for (Iterator<Integer> it = list.iterator(); it.hasNext();) {
-                  Integer integer = it.next();
-                  Util.discard(integer);
-                  if (n++ % 10 == 0) {
-                    it.remove();
-                  }
+            "delete 10% of " + size.right + " values, " + pair.right, statistician -> {
+              final List<Integer> list = pair.left.apply();
+              list.addAll(Collections.nCopies(size.left, 1));
+              long start = System.currentTimeMillis();
+              int n = 0;
+              for (Iterator<Integer> it = list.iterator(); it.hasNext();) {
+                Integer integer = it.next();
+                Util.discard(integer);
+                if (n++ % 10 == 0) {
+                  it.remove();
                 }
-                statistician.record(start);
-                return null;
               }
+              statistician.record(start);
+              return null;
             },
             10).run();
       }
@@ -479,22 +455,19 @@ public class ChunkListTest {
           continue;
         }
         new Benchmark("get from " + size.right + " values, "
-            + (size.left / 1000) + " times, " + pair.right,
-            new Function1<Benchmark.Statistician, Void>() {
-              public Void apply(Benchmark.Statistician statistician) {
-                final List<Integer> list = pair.left.apply();
-                list.addAll(Collections.nCopies(size.left, 1));
-                final int probeCount = size.left / 1000;
-                final Random random = new Random(1);
-                long start = System.currentTimeMillis();
-                int n = 0;
-                for (int i = 0; i < probeCount; i++) {
-                  n += list.get(random.nextInt(list.size()));
-                }
-                assert n == probeCount;
-                statistician.record(start);
-                return null;
+            + (size.left / 1000) + " times, " + pair.right, statistician -> {
+              final List<Integer> list = pair.left.apply();
+              list.addAll(Collections.nCopies(size.left, 1));
+              final int probeCount = size.left / 1000;
+              final Random random = new Random(1);
+              long start = System.currentTimeMillis();
+              int n = 0;
+              for (int i = 0; i < probeCount; i++) {
+                n += list.get(random.nextInt(list.size()));
               }
+              assert n == probeCount;
+              statistician.record(start);
+              return null;
             },
             10).run();
       }
@@ -507,38 +480,35 @@ public class ChunkListTest {
         new Benchmark(
             "add " + size.right
             + " values, delete 10%, insert 20%, get 1%, using "
-            + pair.right,
-            new Function1<Benchmark.Statistician, Void>() {
-              public Void apply(Benchmark.Statistician statistician) {
-                final List<Integer> list = pair.left.apply();
-                final int probeCount = size.left / 100;
-                long start = System.currentTimeMillis();
-                list.addAll(Collections.nCopies(size.left, 1));
-                final Random random = new Random(1);
-                for (Iterator<Integer> it = list.iterator();
-                     it.hasNext();) {
-                  Integer integer = it.next();
-                  Util.discard(integer);
-                  if (random.nextInt(10) == 0) {
-                    it.remove();
-                  }
+            + pair.right, statistician -> {
+              final List<Integer> list = pair.left.apply();
+              final int probeCount = size.left / 100;
+              long start = System.currentTimeMillis();
+              list.addAll(Collections.nCopies(size.left, 1));
+              final Random random = new Random(1);
+              for (Iterator<Integer> it = list.iterator();
+                   it.hasNext();) {
+                Integer integer = it.next();
+                Util.discard(integer);
+                if (random.nextInt(10) == 0) {
+                  it.remove();
                 }
-                for (ListIterator<Integer> it = list.listIterator();
-                     it.hasNext();) {
-                  Integer integer = it.next();
-                  Util.discard(integer);
-                  if (random.nextInt(5) == 0) {
-                    it.add(2);
-                  }
-                }
-                int n = 0;
-                for (int i = 0; i < probeCount; i++) {
-                  n += list.get(random.nextInt(list.size()));
-                }
-                assert n > probeCount;
-                statistician.record(start);
-                return null;
               }
+              for (ListIterator<Integer> it = list.listIterator();
+                   it.hasNext();) {
+                Integer integer = it.next();
+                Util.discard(integer);
+                if (random.nextInt(5) == 0) {
+                  it.add(2);
+                }
+              }
+              int n = 0;
+              for (int i = 0; i < probeCount; i++) {
+                n += list.get(random.nextInt(list.size()));
+              }
+              assert n > probeCount;
+              statistician.record(start);
+              return null;
             },
             10).run();
       }

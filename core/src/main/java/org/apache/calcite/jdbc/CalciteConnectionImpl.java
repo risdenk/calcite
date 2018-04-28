@@ -161,18 +161,15 @@ abstract class CalciteConnectionImpl
 
   @Override public <T> T unwrap(Class<T> iface) throws SQLException {
     if (iface == RelRunner.class) {
-      return iface.cast(
-          new RelRunner() {
-            public PreparedStatement prepare(RelNode rel) {
-              try {
-                return prepareStatement_(CalcitePrepare.Query.of(rel),
-                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-                    getHoldability());
-              } catch (SQLException e) {
-                throw new RuntimeException(e);
-              }
-            }
-          });
+      return iface.cast((RelRunner) rel -> {
+        try {
+          return prepareStatement_(CalcitePrepare.Query.of(rel),
+              ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+              getHoldability());
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      });
     }
     return super.unwrap(iface);
   }

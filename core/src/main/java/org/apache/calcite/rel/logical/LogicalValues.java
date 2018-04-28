@@ -84,12 +84,8 @@ public class LogicalValues extends Values {
       final ImmutableList<ImmutableList<RexLiteral>> tuples) {
     final RelMetadataQuery mq = cluster.getMetadataQuery();
     final RelTraitSet traitSet = cluster.traitSetOf(Convention.NONE)
-        .replaceIfs(
-            RelCollationTraitDef.INSTANCE, new Supplier<List<RelCollation>>() {
-              public List<RelCollation> get() {
-                return RelMdCollation.values(mq, rowType, tuples);
-              }
-            });
+        .replaceIfs(RelCollationTraitDef.INSTANCE,
+            () -> RelMdCollation.values(mq, rowType, tuples));
     return new LogicalValues(cluster, traitSet, rowType, tuples);
   }
 

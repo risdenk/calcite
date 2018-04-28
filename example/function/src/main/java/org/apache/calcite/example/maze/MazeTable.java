@@ -103,11 +103,7 @@ public class MazeTable extends AbstractTable implements ScannableTable {
           solutionSet = null;
         }
         return Linq4j.transform(maze.enumerator(solutionSet),
-            new Function1<String, Object[]>() {
-              public Object[] apply(String s) {
-                return new Object[] {s};
-              }
-            });
+            s -> new Object[] {s});
       }
     };
   }

@@ -72,7 +72,7 @@ public class SortNode extends AbstractSingleNode<Sort> {
       while ((row = source.receive()) != null) {
         list.add(row);
       }
-      Collections.sort(list, comparator());
+      list.sort(comparator());
       final int end = fetch < 0 || offset + fetch > list.size()
           ? list.size()
           : offset + fetch;
@@ -89,11 +89,7 @@ public class SortNode extends AbstractSingleNode<Sort> {
     }
     return Ordering.compound(
         Iterables.transform(rel.getCollation().getFieldCollations(),
-            new Function<RelFieldCollation, Comparator<Row>>() {
-              public Comparator<Row> apply(RelFieldCollation input) {
-                return comparator(input);
-              }
-            }));
+            this::comparator));
   }
 
   private Comparator<Row> comparator(RelFieldCollation fieldCollation) {
@@ -101,20 +97,16 @@ public class SortNode extends AbstractSingleNode<Sort> {
     final int x = fieldCollation.getFieldIndex();
     switch (fieldCollation.direction) {
     case ASCENDING:
-      return new Comparator<Row>() {
-        public int compare(Row o1, Row o2) {
-          final Comparable c1 = (Comparable) o1.getValues()[x];
-          final Comparable c2 = (Comparable) o2.getValues()[x];
-          return RelFieldCollation.compare(c1, c2, nullComparison);
-        }
+      return (o1, o2) -> {
+        final Comparable c1 = (Comparable) o1.getValues()[x];
+        final Comparable c2 = (Comparable) o2.getValues()[x];
+        return RelFieldCollation.compare(c1, c2, nullComparison);
       };
     default:
-      return new Comparator<Row>() {
-        public int compare(Row o1, Row o2) {
-          final Comparable c1 = (Comparable) o1.getValues()[x];
-          final Comparable c2 = (Comparable) o2.getValues()[x];
-          return RelFieldCollation.compare(c2, c1, -nullComparison);
-        }
+      return (o1, o2) -> {
+        final Comparable c1 = (Comparable) o1.getValues()[x];
+        final Comparable c2 = (Comparable) o2.getValues()[x];
+        return RelFieldCollation.compare(c2, c1, -nullComparison);
       };
     }
   }

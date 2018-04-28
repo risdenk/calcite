@@ -73,11 +73,7 @@ public class EnumerableProject extends Project implements EnumerableRel {
     final RelTraitSet traitSet =
         cluster.traitSet().replace(EnumerableConvention.INSTANCE)
             .replaceIfs(RelCollationTraitDef.INSTANCE,
-                new Supplier<List<RelCollation>>() {
-                  public List<RelCollation> get() {
-                    return RelMdCollation.project(mq, input, projects);
-                  }
-                });
+                () -> RelMdCollation.project(mq, input, projects));
     return new EnumerableProject(cluster, traitSet, input, projects, rowType);
   }
 

@@ -2593,13 +2593,9 @@ public class SqlToRelConverterTest extends SqlToRelTestBase {
   }
 
   private Tester getExtendedTester() {
-    return tester.withCatalogReaderFactory(
-      new Function<RelDataTypeFactory, Prepare.CatalogReader>() {
-        public Prepare.CatalogReader apply(RelDataTypeFactory typeFactory) {
-          return new MockCatalogReader(typeFactory, true)
-              .init().init2();
-        }
-      });
+    return tester
+        .withCatalogReaderFactory(typeFactory ->
+            new MockCatalogReader(typeFactory, true).init().init2());
   }
 
   private Tester getTesterWithDynamicTable() {
@@ -2644,15 +2640,12 @@ public class SqlToRelConverterTest extends SqlToRelTestBase {
   }
 
   @Test public void testLarge() {
-    SqlValidatorTest.checkLarge(400,
-        new Function<String, Void>() {
-          public Void apply(String input) {
-            final RelRoot root = tester.convertSqlToRel(input);
-            final String s = RelOptUtil.toString(root.project());
-            assertThat(s, notNullValue());
-            return null;
-          }
-        });
+    SqlValidatorTest.checkLarge(400, input -> {
+      final RelRoot root = tester.convertSqlToRel(input);
+      final String s = RelOptUtil.toString(root.project());
+      assertThat(s, notNullValue());
+      return null;
+    });
   }
 
   @Test public void testUnionInFrom() {

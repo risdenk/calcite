@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 /**
@@ -60,16 +61,12 @@ public class Elasticsearch2AdapterIT {
 
   /** Returns a function that checks that a particular Elasticsearch pipeline is
    * generated to implement a query. */
-  private static Function<List, Void> elasticsearchChecker(final String... strings) {
-    return new Function<List, Void>() {
-      @Nullable
-      @Override public Void apply(@Nullable List actual) {
-        Object[] actualArray = actual == null || actual.isEmpty() ? null
-            : ((List) actual.get(0)).toArray();
-        CalciteAssert.assertArrayEqual("expected Elasticsearch query not found", strings,
-            actualArray);
-        return null;
-      }
+  private static Consumer<List> elasticsearchChecker(final String... strings) {
+    return actual -> {
+      Object[] actualArray = actual == null || actual.isEmpty() ? null
+          : ((List) actual.get(0)).toArray();
+      CalciteAssert.assertArrayEqual("expected Elasticsearch query not found", strings,
+          actualArray);
     };
   }
 

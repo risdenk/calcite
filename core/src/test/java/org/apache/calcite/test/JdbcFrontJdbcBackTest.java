@@ -16,9 +16,7 @@
  */
 package org.apache.calcite.test;
 
-import org.apache.calcite.jdbc.CalciteConnection;
 
-import com.google.common.base.Function;
 
 import org.hamcrest.Matcher;
 import org.junit.Ignore;

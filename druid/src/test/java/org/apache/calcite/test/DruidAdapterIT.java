@@ -20,16 +20,13 @@ import org.apache.calcite.adapter.druid.DruidQuery;
 import org.apache.calcite.adapter.druid.DruidSchema;
 import org.apache.calcite.config.CalciteConnectionConfig;
 import org.apache.calcite.config.CalciteConnectionProperty;
-import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.SqlTypeName;
-import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -38,11 +35,11 @@ import com.google.common.collect.Multimap;
 import org.junit.Test;
 
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -107,9 +104,9 @@ public class DruidAdapterIT {
     return ENABLED;
   }
 
-  /** Returns a function that checks that a particular Druid query is
+  /** Returns a consumer that checks that a particular Druid query is
    * generated to implement a query. */
-  private static Function<List, Void> druidChecker(final String... lines) {
+  private static Consumer<List> druidChecker(final String... lines) {
     return list -> {
       assertThat(list.size(), is(1));
       DruidQuery.QuerySpec querySpec = (DruidQuery.QuerySpec) list.get(0);
@@ -117,7 +114,6 @@ public class DruidAdapterIT {
         final String s = line.replace('\'', '"');
         assertThat(querySpec.getQueryString(null, -1), containsString(s));
       }
-      return null;
     };
   }
 
@@ -502,7 +498,6 @@ public class DruidAdapterIT {
             assertThat(input.getString(1), is("86829"));
             assertThat(input.wasNull(), is(false));
             assertThat(input.next(), is(false));
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -796,7 +791,6 @@ public class DruidAdapterIT {
                   is("Fort West Dried Apricots"));
             }
             assertFalse(resultSet.next());
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -826,7 +820,6 @@ public class DruidAdapterIT {
                   is("Fort West Dried Apricots"));
             }
             assertFalse(resultSet.next());
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -873,7 +866,6 @@ public class DruidAdapterIT {
                   is("Fort West Dried Apricots"));
             }
             assertFalse(resultSet.next());
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }

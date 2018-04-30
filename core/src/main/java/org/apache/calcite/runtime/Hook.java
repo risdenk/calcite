@@ -94,13 +94,6 @@ public enum Hook {
   private final ThreadLocal<List<Consumer<Object>>> threadHandlers =
       ThreadLocal.withInitial(ArrayList::new);
 
-  /** @deprecated Use {@link #addThread(Consumer)}. */
-  @SuppressWarnings("Guava")
-  @Deprecated // to be removed in 2.0
-  public <T, R> Closeable add(final Function<T, R> handler) {
-    return add((Consumer<T>) handler::apply);
-  }
-
   /** Adds a handler for this Hook.
    *
    * <p>Returns a {@link Hook.Closeable} so that you can use the following
@@ -121,9 +114,23 @@ public enum Hook {
     return () -> remove(handler);
   }
 
+  /** @deprecated Use {@link #addThread(Consumer)}. */
+  @SuppressWarnings("Guava")
+  @Deprecated // to be removed in 2.0
+  public <T, R> Closeable add(final Function<T, R> handler) {
+    return add((Consumer<T>) handler::apply);
+  }
+
   /** Removes a handler from this Hook. */
   private boolean remove(Consumer handler) {
     return handlers.remove(handler);
+  }
+
+  /** Adds a handler for this thread. */
+  public <T> Closeable addThread(final Consumer<T> handler) {
+    //noinspection unchecked
+    threadHandlers.get().add((Consumer<Object>) handler);
+    return () -> removeThread(handler);
   }
 
   /** @deprecated Use {@link #addThread(Consumer)}. */
@@ -132,13 +139,6 @@ public enum Hook {
   public <T, R> Closeable addThread(
       final com.google.common.base.Function<T, R> handler) {
     return addThread((Consumer<T>) handler::apply);
-  }
-
-  /** Adds a handler for this thread. */
-  public <T> Closeable addThread(final Consumer<T> handler) {
-    //noinspection unchecked
-    threadHandlers.get().add((Consumer<Object>) handler);
-    return () -> removeThread(handler);
   }
 
   /** Removes a thread handler from this Hook. */
@@ -186,7 +186,7 @@ public enum Hook {
   /** Removes a Hook after use. */
   public interface Closeable extends AutoCloseable {
     /** Closeable that does nothing. */
-    Closeable EMPTY = () -> {};
+    Closeable EMPTY = () -> { };
 
     // override, removing "throws"
     @Override void close();

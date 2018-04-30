@@ -50,7 +50,7 @@ import java.util.function.Consumer;
  * (See {@link org.apache.calcite.test.CalciteAssert#ENABLE_SLOW}.)</p> */
 public class TpcdsTest {
   private static Consumer<Pair<List<Prepare.Materialization>, Holder<Program>>>
-  handler(boolean bushy, int minJoinCount) {
+      handler(boolean bushy, int minJoinCount) {
     return pair -> pair.right.set(
         Programs.sequence(
             Programs.heuristicJoinOrder(Programs.RULE_SET, bushy,

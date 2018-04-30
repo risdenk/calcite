@@ -89,7 +89,7 @@ public abstract class ConverterRule extends RelOptRule {
   }
 
   @SuppressWarnings("Guava")
-  @Deprecated
+  @Deprecated // to be removed before 2.0
   public <R extends RelNode> ConverterRule(Class<R> clazz,
       com.google.common.base.Predicate<? super R> predicate, RelTrait in,
       RelTrait out, RelBuilderFactory relBuilderFactory, String description) {

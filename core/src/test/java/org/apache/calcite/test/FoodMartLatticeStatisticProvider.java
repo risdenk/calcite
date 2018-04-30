@@ -35,8 +35,9 @@ import java.util.Map;
  */
 public class FoodMartLatticeStatisticProvider
     extends DelegatingLatticeStatisticProvider {
-  public static final FoodMartLatticeStatisticProvider.Factory FACTORY = lattice -> new FoodMartLatticeStatisticProvider(lattice,
-      Lattices.CACHED_SQL.apply(lattice));
+  public static final FoodMartLatticeStatisticProvider.Factory FACTORY =
+      lattice -> new FoodMartLatticeStatisticProvider(lattice,
+          Lattices.CACHED_SQL.apply(lattice));
 
   private static final Map<String, Integer> CARDINALITY_MAP =
       ImmutableMap.<String, Integer>builder()

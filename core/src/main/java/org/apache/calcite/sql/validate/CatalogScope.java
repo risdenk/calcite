@@ -17,8 +17,6 @@
 package org.apache.calcite.sql.validate;
 
 import org.apache.calcite.linq4j.Linq4j;
-import org.apache.calcite.linq4j.function.Function1;
-import org.apache.calcite.linq4j.function.Predicate1;
 import org.apache.calcite.sql.SqlNode;
 
 import com.google.common.collect.ImmutableList;

@@ -620,7 +620,7 @@ public class SqlValidatorTestCase {
     public Sql bindType(final String bindType) {
       tester.check(sql, null, parameterRowType ->
           assertThat(parameterRowType.toString(), is(bindType)),
-          result -> {});
+          result -> { });
       return this;
     }
 

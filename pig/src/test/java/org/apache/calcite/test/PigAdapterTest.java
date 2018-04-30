@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.test;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
@@ -24,6 +23,7 @@ import org.junit.Test;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -170,7 +170,7 @@ public class PigAdapterTest extends AbstractPigTest {
   /** Returns a function that checks that a particular Pig Latin scriptis
    * generated to implement a query. */
   @SuppressWarnings("rawtypes")
-  private static Function<List, Void> pigScriptChecker(final String... strings) {
+  private static Consumer<List> pigScriptChecker(final String... strings) {
     return actual -> {
       String actualArray =
           actual == null || actual.isEmpty()
@@ -178,7 +178,6 @@ public class PigAdapterTest extends AbstractPigTest {
               : (String) actual.get(0);
       assertEquals("expected Pig script not found",
           strings[0], actualArray);
-      return null;
     };
   }
 }

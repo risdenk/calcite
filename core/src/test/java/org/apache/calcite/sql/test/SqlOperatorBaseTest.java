@@ -4843,7 +4843,7 @@ public abstract class SqlOperatorBaseTest {
     final Hook.Closeable closeable;
     if (CalciteAssert.ENABLE_SLOW) {
       calendar = getCalendarNotTooNear(Calendar.HOUR_OF_DAY);
-      closeable = () -> {};
+      closeable = () -> { };
     } else {
       calendar = Util.calendar();
       calendar.set(Calendar.YEAR, 2014);
@@ -6974,7 +6974,7 @@ public abstract class SqlOperatorBaseTest {
                 query = SqlTesterImpl.buildQuery(s);
               }
               tester.check(query, SqlTests.ANY_TYPE_CHECKER,
-                  SqlTests.ANY_PARAMETER_CHECKER, result -> {});
+                  SqlTests.ANY_PARAMETER_CHECKER, result -> { });
             }
           } catch (Error e) {
             System.out.println(s + ": " + e.getMessage());

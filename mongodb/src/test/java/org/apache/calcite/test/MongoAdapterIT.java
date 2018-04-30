@@ -21,7 +21,6 @@ import org.apache.calcite.util.Bug;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -35,6 +34,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -122,7 +122,7 @@ public class MongoAdapterIT {
 
   /** Returns a function that checks that a particular MongoDB pipeline is
    * generated to implement a query. */
-  private static Function<List, Void> mongoChecker(final String... strings) {
+  private static Consumer<List> mongoChecker(final String... strings) {
     return actual -> {
       Object[] actualArray =
           actual == null || actual.isEmpty()
@@ -130,13 +130,12 @@ public class MongoAdapterIT {
               : ((List) actual.get(0)).toArray();
       CalciteAssert.assertArrayEqual("expected MongoDB query not found",
           strings, actualArray);
-      return null;
     };
   }
 
   /** Similar to {@link CalciteAssert#checkResultUnordered}, but filters strings
    * before comparing them. */
-  static Function<ResultSet, Void> checkResultUnordered(
+  static Consumer<ResultSet> checkResultUnordered(
       final String... lines) {
     return resultSet -> {
       try {
@@ -154,7 +153,6 @@ public class MongoAdapterIT {
 
         assertThat(Ordering.natural().immutableSortedCopy(actualList),
             equalTo(expectedList));
-        return null;
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }
@@ -827,7 +825,6 @@ public class MongoAdapterIT {
           try {
             assertThat(input.next(), CoreMatchers.is(true));
             assertThat(input.getInt(1), CoreMatchers.is(29353));
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }

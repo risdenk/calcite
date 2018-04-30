@@ -35,10 +35,10 @@ import org.apache.calcite.runtime.ArrayBindable;
 import org.apache.calcite.runtime.Bindable;
 import org.apache.calcite.tools.RelBuilderFactory;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Relational expression that converts an enumerable input to interpretable
@@ -96,7 +96,7 @@ public class EnumerableBindable extends ConverterImpl implements BindableRel {
      */
     public EnumerableToBindableConverterRule(
         RelBuilderFactory relBuilderFactory) {
-      super(EnumerableRel.class, Predicates.<RelNode>alwaysTrue(),
+      super(EnumerableRel.class, (Predicate<RelNode>) r -> true,
           EnumerableConvention.INSTANCE, BindableConvention.INSTANCE,
           relBuilderFactory, "EnumerableToBindableConverterRule");
     }

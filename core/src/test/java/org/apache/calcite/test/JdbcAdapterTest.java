@@ -17,11 +17,9 @@
 package org.apache.calcite.test;
 
 import org.apache.calcite.config.Lex;
-import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.test.CalciteAssert.AssertThat;
 import org.apache.calcite.test.CalciteAssert.DatabaseInstance;
 
-import com.google.common.base.Function;
 
 import org.hsqldb.jdbcDriver;
 

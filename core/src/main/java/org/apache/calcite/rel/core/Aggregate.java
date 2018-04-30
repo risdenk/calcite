@@ -71,14 +71,14 @@ public abstract class Aggregate extends SingleRel {
   /**
    * @see org.apache.calcite.util.Bug#CALCITE_461_FIXED
    */
-  public static boolean IS_SIMPLE_J(Aggregate aggregate) {
+  public static boolean isSimple(Aggregate aggregate) {
     return aggregate.getGroupType() == Group.SIMPLE;
   }
 
   @SuppressWarnings("Guava")
   @Deprecated // to be converted to Java Predicate before 2.0
   public static final com.google.common.base.Predicate<Aggregate> IS_SIMPLE =
-      Aggregate::IS_SIMPLE_J;
+      Aggregate::isSimple;
 
   @SuppressWarnings("Guava")
   @Deprecated // to be converted to Java Predicate before 2.0

@@ -72,12 +72,11 @@ import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.ImmutableIntList;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Utilities pertaining to {@link BindableRel} and {@link BindableConvention}.
@@ -265,8 +264,10 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableFilterRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalFilter.class, RelOptUtil.FILTER_PREDICATE, Convention.NONE,
-          BindableConvention.INSTANCE, relBuilderFactory, "BindableFilterRule");
+      super(LogicalFilter.class,
+          (Predicate<LogicalFilter>) RelOptUtil::containsMultisetOrWindowedAgg,
+          Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
+          "BindableFilterRule");
     }
 
     public RelNode convert(RelNode rel) {
@@ -330,8 +331,9 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableProjectRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalProject.class, RelOptUtil.PROJECT_PREDICATE, Convention.NONE,
-          BindableConvention.INSTANCE, relBuilderFactory,
+      super(LogicalProject.class,
+          (Predicate<LogicalProject>) RelOptUtil::containsMultisetOrWindowedAgg,
+          Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableProjectRule");
     }
 
@@ -387,7 +389,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableSortRule(RelBuilderFactory relBuilderFactory) {
-      super(Sort.class, Predicates.<RelNode>alwaysTrue(), Convention.NONE,
+      super(Sort.class, (Predicate<RelNode>) r -> true, Convention.NONE,
           BindableConvention.INSTANCE, relBuilderFactory, "BindableSortRule");
     }
 
@@ -443,7 +445,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableJoinRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalJoin.class, Predicates.<RelNode>alwaysTrue(),
+      super(LogicalJoin.class, (Predicate<RelNode>) r -> true,
           Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableJoinRule");
     }
@@ -513,7 +515,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableUnionRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalUnion.class, Predicates.<RelNode>alwaysTrue(),
+      super(LogicalUnion.class, (Predicate<RelNode>) r -> true,
           Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableUnionRule");
     }
@@ -588,7 +590,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableValuesRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalValues.class, Predicates.<RelNode>alwaysTrue(),
+      super(LogicalValues.class, (Predicate<RelNode>) r -> true,
           Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableValuesRule");
     }
@@ -666,7 +668,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableAggregateRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalAggregate.class, Predicates.<RelNode>alwaysTrue(),
+      super(LogicalAggregate.class, (Predicate<RelNode>) r -> true,
           Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableAggregateRule");
     }
@@ -731,7 +733,7 @@ public class Bindables {
      * @param relBuilderFactory Builder for relational expressions
      */
     public BindableWindowRule(RelBuilderFactory relBuilderFactory) {
-      super(LogicalWindow.class, Predicates.<RelNode>alwaysTrue(),
+      super(LogicalWindow.class, (Predicate<RelNode>) r -> true,
           Convention.NONE, BindableConvention.INSTANCE, relBuilderFactory,
           "BindableWindowRule");
     }

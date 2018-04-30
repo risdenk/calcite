@@ -135,7 +135,7 @@ public abstract class QuidemTest {
             if (propertyName.equals("bindable")) {
               final boolean b = value instanceof Boolean
                   && (Boolean) value;
-              closer.add(Hook.ENABLE_BINDABLE.addThread(Hook.property(b)));
+              closer.add(Hook.ENABLE_BINDABLE.addThread(Hook.propertyJ(b)));
             }
             if (propertyName.equals("expand")) {
               final boolean b = value instanceof Boolean

@@ -24,23 +24,20 @@ import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.util.Holder;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
-
 import org.hamcrest.CoreMatchers;
 import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -92,7 +89,6 @@ public class OsAdapterTest {
             assertThat(r.getInt(1), notNullValue());
             assertThat(r.getString(2), CoreMatchers.startsWith("./"));
             assertThat(r.wasNull(), is(false));
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -110,7 +106,6 @@ public class OsAdapterTest {
             assertThat(r.wasNull(), is(false));
             assertThat(r.next(), is(true));
             assertThat(r.next(), is(false)); // because of "limit 2"
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -139,7 +134,6 @@ public class OsAdapterTest {
               assertThat(r.wasNull(), is(false));
             }
             assertThat(b.toString(), notNullValue());
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -155,7 +149,6 @@ public class OsAdapterTest {
             assertThat(r.next(), is(true));
             assertThat(r.getString(1), notNullValue());
             assertThat(r.wasNull(), is(false));
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -170,7 +163,6 @@ public class OsAdapterTest {
             assertThat(r.next(), is(true));
             assertThat(r.getString(1), notNullValue());
             assertThat(r.wasNull(), is(false));
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -196,7 +188,6 @@ public class OsAdapterTest {
               assertThat(r.getLong(i + 1), notNullValue());
               assertThat(r.wasNull(), is(false));
             }
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
@@ -204,18 +195,18 @@ public class OsAdapterTest {
   }
 
   @Test public void testStdin() throws SQLException {
-    try (Hook.Closeable ignore = Hook.STANDARD_STREAMS.addThread((Function<Holder<Object[]>, Void>) o -> {
-      final Object[] values = o.get();
-      final InputStream in = (InputStream) values[0];
-      final String s = "First line\n"
-          + "Second line";
-      final ByteArrayInputStream in2 =
-          new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
-      final OutputStream out = (OutputStream) values[1];
-      final OutputStream err = (OutputStream) values[2];
-      o.set(new Object[] {in2, out, err});
-      return null;
-    })) {
+    try (Hook.Closeable ignore = Hook.STANDARD_STREAMS.addThread(
+        (Consumer<Holder<Object[]>>) o -> {
+          final Object[] values = o.get();
+          final InputStream in = (InputStream) values[0];
+          final String s = "First line\n"
+              + "Second line";
+          final ByteArrayInputStream in2 =
+              new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+          final OutputStream out = (OutputStream) values[1];
+          final OutputStream err = (OutputStream) values[2];
+          o.set(new Object[] {in2, out, err});
+        })) {
       assertThat(foo("select count(*) as c from stdin"), is("2\n"));
     }
   }

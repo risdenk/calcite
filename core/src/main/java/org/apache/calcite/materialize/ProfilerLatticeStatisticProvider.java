@@ -17,7 +17,6 @@
 package org.apache.calcite.materialize;
 
 import org.apache.calcite.linq4j.Enumerable;
-import org.apache.calcite.linq4j.function.Function1;
 import org.apache.calcite.profile.Profiler;
 import org.apache.calcite.profile.ProfilerImpl;
 import org.apache.calcite.rel.metadata.NullSentinel;

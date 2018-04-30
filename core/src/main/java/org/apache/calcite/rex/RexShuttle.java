@@ -16,13 +16,11 @@
  */
 package org.apache.calcite.rex;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * Passes over a row-expression, calling a handler method for each node,

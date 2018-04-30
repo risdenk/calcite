@@ -39,7 +39,6 @@ import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -269,7 +268,6 @@ public class StreamTest {
           // With a 3 millisecond delay, typically n is between 200 - 400
           // before cancel takes effect.
           assertTrue("n is " + n, n > 5);
-          return null;
         });
   }
 

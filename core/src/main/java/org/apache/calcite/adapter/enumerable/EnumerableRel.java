@@ -17,14 +17,8 @@
 package org.apache.calcite.adapter.enumerable;
 
 import org.apache.calcite.linq4j.tree.BlockStatement;
-import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.RelFactories;
-import org.apache.calcite.rel.type.RelDataType;
-import org.apache.calcite.rex.RexUtil;
-import org.apache.calcite.sql.validate.SqlValidatorUtil;
-
-import java.util.List;
 
 /**
  * A relational expression of one of the
@@ -35,14 +29,7 @@ public interface EnumerableRel
     extends RelNode {
   RelFactories.FilterFactory FILTER_FACTORY = EnumerableFilter::create;
 
-  RelFactories.ProjectFactory PROJECT_FACTORY =
-      (child, projects, fieldNames) -> {
-        final RelOptCluster cluster = child.getCluster();
-        final RelDataType rowType =
-            RexUtil.createStructType(cluster.getTypeFactory(), projects,
-                fieldNames, SqlValidatorUtil.F_SUGGESTER);
-        return EnumerableProject.create(child, projects, rowType);
-      };
+  RelFactories.ProjectFactory PROJECT_FACTORY = EnumerableProject::create;
 
   //~ Methods ----------------------------------------------------------------
 

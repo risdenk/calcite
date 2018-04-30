@@ -123,8 +123,8 @@ public abstract class PruneEmptyRules {
   public static final RelOptRule MINUS_INSTANCE =
       new RelOptRule(
           operand(LogicalMinus.class,
-              unordered(operandJ(Values.class, null, Values::isEmpty,
-                  none()))),
+              unordered(
+                  operandJ(Values.class, null, Values::isEmpty, none()))),
           "Minus") {
         public void onMatch(RelOptRuleCall call) {
           final LogicalMinus minus = call.rel(0);
@@ -177,8 +177,8 @@ public abstract class PruneEmptyRules {
   public static final RelOptRule INTERSECT_INSTANCE =
       new RelOptRule(
           operand(LogicalIntersect.class,
-              unordered(operandJ(Values.class, null, Values::isEmpty,
-                  none()))),
+              unordered(
+                  operandJ(Values.class, null, Values::isEmpty, none()))),
           "Intersect") {
         public void onMatch(RelOptRuleCall call) {
           LogicalIntersect intersect = call.rel(0);

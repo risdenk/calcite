@@ -30,7 +30,6 @@ import org.apache.calcite.schema.Schemas;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.AbstractTableQueryable;
 
-import com.google.common.base.Function;
 
 import org.junit.Ignore;
 import org.junit.Test;

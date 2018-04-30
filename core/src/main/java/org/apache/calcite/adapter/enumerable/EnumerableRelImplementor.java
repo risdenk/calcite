@@ -42,7 +42,6 @@ import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.runtime.Bindable;
 import org.apache.calcite.util.BuiltInMethod;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

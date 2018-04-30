@@ -88,7 +88,6 @@ import org.apache.calcite.util.mapping.Mappings;
 import org.apache.calcite.util.trace.CalciteTrace;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -119,7 +118,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import javax.annotation.Nonnull;
 
 /**
@@ -2002,7 +2000,7 @@ public class RelDecorrelator implements ReflectiveVisitor {
           operand(LogicalCorrelate.class,
               operand(RelNode.class, any()),
               operand(LogicalProject.class,
-                  operand(LogicalAggregate.class, null, Aggregate.IS_SIMPLE,
+                  operandJ(LogicalAggregate.class, null, Aggregate::isSimple,
                       operand(LogicalProject.class,
                           operand(RelNode.class, any()))))),
           relBuilderFactory, null);

@@ -118,21 +118,21 @@ public class CalciteRemoteDriverTest {
 
   private static final Function<Connection, ResultSet> GET_COLUMNS =
       connection -> {
-    try {
-      return connection.getMetaData().getColumns(null, null, null, null);
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  };
+        try {
+          return connection.getMetaData().getColumns(null, null, null, null);
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      };
 
   private static final Function<Connection, ResultSet> GET_TYPEINFO =
       connection -> {
-    try {
-      return connection.getMetaData().getTypeInfo();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  };
+        try {
+          return connection.getMetaData().getTypeInfo();
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      };
 
   private static final Function<Connection, ResultSet> GET_TABLE_TYPES =
       connection -> {

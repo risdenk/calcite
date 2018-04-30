@@ -16,26 +16,19 @@
  */
 package org.apache.calcite.profile;
 
-import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.linq4j.AbstractEnumerable;
 import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.Enumerator;
 import org.apache.calcite.rel.metadata.NullSentinel;
-import org.apache.calcite.runtime.PredicateImpl;
 import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.test.Matchers;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.JsonBuilder;
-import org.apache.calcite.util.Pair;
+import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 
@@ -54,7 +47,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -398,8 +393,7 @@ public class ProfilerTest {
 
   private static Fluid sql(String sql) {
     return new Fluid(CalciteAssert.Config.SCOTT, sql, Fluid.SIMPLE_FACTORY,
-        Predicates.<Profiler.Statistic>alwaysTrue(), null, -1,
-        Fluid.DEFAULT_COLUMNS);
+        s -> true, null, -1, Fluid.DEFAULT_COLUMNS);
   }
 
   /** Fluid interface for writing profiler test cases. */
@@ -543,16 +537,15 @@ public class ProfilerTest {
               final Profiler.Profile profile =
                   p.profile(rows, columns, initialGroups);
               final List<Profiler.Statistic> statistics =
-                  ImmutableList.copyOf(
-                      Iterables.filter(profile.statistics(), predicate));
+                  profile.statistics().stream().filter(predicate)
+                      .collect(Util.toImmutableList());
 
               // If no comparator specified, use the function that converts to
               // JSON strings
-              final Function<Profiler.Statistic, String> toJson =
-                  toJsonFunction();
+              final StatisticToJson toJson = new StatisticToJson();
               Ordering<Profiler.Statistic> comp = comparator != null
                   ? Ordering.from(comparator)
-                  : Ordering.natural().onResultOf(toJson);
+                  : Ordering.natural().onResultOf(toJson::apply);
               ImmutableList<Profiler.Statistic> statistics2 =
                   comp.immutableSortedCopy(statistics);
               if (limit >= 0 && limit < statistics2.size()) {
@@ -560,32 +553,14 @@ public class ProfilerTest {
               }
 
               final List<String> strings =
-                  Lists.transform(statistics2, toJson);
+                  statistics2.stream().map(toJson::apply)
+                      .collect(Collectors.toList());
               assertThat(strings, matcher);
             } catch (SQLException e) {
               throw new RuntimeException(e);
             }
           });
       return this;
-    }
-
-    /** Returns a function that converts a statistic to a JSON string. */
-    Function<Profiler.Statistic, String> toJsonFunction() {
-      return new Function<Profiler.Statistic, String>() {
-        final JsonBuilder jb = new JsonBuilder();
-
-        public String apply(Profiler.Statistic statistic) {
-          Object map = statistic.toMap(jb);
-          if (map instanceof Map) {
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> map1 = (Map) map;
-            map1.keySet().retainAll(Fluid.this.columns);
-          }
-          final String json = jb.toJsonString(map);
-          return json.replaceAll("\n", "").replaceAll(" ", "")
-              .replaceAll("\"", "");
-        }
-      };
     }
 
     private Enumerable<List<Comparable>> getRows(final PreparedStatement s) {
@@ -637,6 +612,23 @@ public class ProfilerTest {
           }
         }
       };
+    }
+
+    /** Returns a function that converts a statistic to a JSON string. */
+    private class StatisticToJson {
+      final JsonBuilder jb = new JsonBuilder();
+
+      public String apply(Profiler.Statistic statistic) {
+        Object map = statistic.toMap(jb);
+        if (map instanceof Map) {
+          @SuppressWarnings("unchecked")
+          final Map<String, Object> map1 = (Map) map;
+          map1.keySet().retainAll(Fluid.this.columns);
+        }
+        final String json = jb.toJsonString(map);
+        return json.replaceAll("\n", "").replaceAll(" ", "")
+            .replaceAll("\"", "");
+      }
     }
   }
 }

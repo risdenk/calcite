@@ -17,12 +17,10 @@
 package org.apache.calcite.adapter.tpch;
 
 import org.apache.calcite.plan.RelOptUtil;
-import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.util.TestUtil;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Ignore;

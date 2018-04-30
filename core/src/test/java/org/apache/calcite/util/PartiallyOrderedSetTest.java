@@ -362,7 +362,8 @@ public class PartiallyOrderedSetTest {
   @Test public void testSubsetRandom() {
     boolean ok = false;
     try {
-      checkPoset(PartiallyOrderedSetTest::isBitSubset, DEBUG, random(random, SCALE / 4, SCALE), false);
+      checkPoset(PartiallyOrderedSetTest::isBitSubset, DEBUG,
+          random(random, SCALE / 4, SCALE), false);
       ok = true;
     } finally {
       if (!ok) {

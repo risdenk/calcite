@@ -37,7 +37,6 @@ import org.apache.calcite.schema.impl.ViewTable;
 import org.apache.calcite.util.Smalls;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Assert;
@@ -547,7 +546,7 @@ public class ReflectiveSchemaTest {
             + " " + fn + " " + name2 + " as c\n"
             + "from \"s\".\"everyTypes\"\n"
             + "where " + name + " <> 0")
-            .returns(resultSet -> {});
+            .returns(resultSet -> { });
       }
     }
   }
@@ -577,7 +576,6 @@ public class ReflectiveSchemaTest {
             throw new RuntimeException(e);
           }
           assertThat(buf.toString(), equalTo("0\n2147483647\n"));
-          return null;
         });
   }
 

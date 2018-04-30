@@ -252,6 +252,16 @@ public abstract class RelOptRule {
     return new ConverterRelOptRuleOperand(clazz, trait, predicate);
   }
 
+  /** @deprecated Use {@link #convertOperand(Class, Predicate, RelTrait)}. */
+  @SuppressWarnings("Guava")
+  @Deprecated // to be removed before 2.0
+  protected static <R extends RelNode> ConverterRelOptRuleOperand
+      convertOperand(Class<R> clazz,
+      com.google.common.base.Predicate<? super R> predicate,
+      RelTrait trait) {
+    return new ConverterRelOptRuleOperand(clazz, trait, predicate::apply);
+  }
+
   //~ Methods for creating lists of child operands ---------------------------
 
   /**

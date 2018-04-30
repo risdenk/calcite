@@ -20,12 +20,10 @@ import org.apache.calcite.rel.RelFieldCollation;
 import org.apache.calcite.rel.core.Sort;
 import org.apache.calcite.rex.RexLiteral;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 

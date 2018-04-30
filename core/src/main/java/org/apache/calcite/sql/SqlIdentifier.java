@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A <code>SqlIdentifier</code> is an identifier, possibly compound.

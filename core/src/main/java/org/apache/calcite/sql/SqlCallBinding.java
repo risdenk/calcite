@@ -30,7 +30,6 @@ import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
 import org.apache.calcite.util.NlsString;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;

@@ -2350,12 +2350,13 @@ public class Util {
    * Returns a {@code Collector} that accumulates the input elements into a
    * Guava {@link ImmutableList} via a {@link ImmutableList.Builder}.
    *
-   * @param <T> the type of the input elements
+   * @param <T> Type of the input elements
+   *
    * @return a {@code Collector} that collects all the input elements into an
-   * {@code {@link ImmutableList}, in encounter order
+   * {@link ImmutableList}, in encounter order
    */
   public static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>
-  toImmutableList() {
+      toImmutableList() {
     return new Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>() {
       public Supplier<ImmutableList.Builder<T>> supplier() {
         return ImmutableList::builder;

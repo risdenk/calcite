@@ -22,7 +22,6 @@ import org.apache.calcite.materialize.Lattice;
 import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.metadata.NullSentinel;
 import org.apache.calcite.runtime.FlatLists;
-import org.apache.calcite.runtime.PredicateImpl;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.PartiallyOrderedSet;
@@ -30,7 +29,6 @@ import org.apache.calcite.util.Util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;

@@ -82,9 +82,7 @@ import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.SqlSpecialOperator;
 import org.apache.calcite.sql.advise.SqlAdvisorGetHintsFunction;
-import org.apache.calcite.sql.parser.SqlAbstractParserImpl;
 import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.calcite.sql.parser.SqlParserImplFactory;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.parser.SqlParserUtil;
 import org.apache.calcite.sql.parser.impl.SqlParserImpl;
@@ -108,7 +106,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Connection;
@@ -138,7 +135,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
@@ -1505,13 +1501,13 @@ public class JdbcTest {
     CalciteAssert.that()
         .with(CalciteAssert.Config.JDBC_FOODMART)
         .query("values extract(year from date '2008-2-23')")
-        .returns(a0 -> {
+        .returns(resultSet -> {
           // The following behavior is not quite correct. See
           //   [CALCITE-508] Reading from ResultSet before calling next()
           //   should throw SQLException not NoSuchElementException
           // for details.
           try {
-            final BigDecimal bigDecimal = a0.getBigDecimal(1);
+            final BigDecimal bigDecimal = resultSet.getBigDecimal(1);
             fail("expected error, got " + bigDecimal);
           } catch (SQLException e) {
             assertThat(e.getMessage(),
@@ -1520,13 +1516,12 @@ public class JdbcTest {
                     + "is Position.BEFORE_START"));
           }
           try {
-            assertTrue(a0.next());
-            final BigDecimal bigDecimal = a0.getBigDecimal(1);
+            assertTrue(resultSet.next());
+            final BigDecimal bigDecimal = resultSet.getBigDecimal(1);
             assertThat(bigDecimal, equalTo(BigDecimal.valueOf(2008)));
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }
-          return null;
         });
   }
 
@@ -6611,7 +6606,6 @@ public class JdbcTest {
                 buf.append(input.getObject(i + 1));
               }
             }
-            return null;
           } catch (SQLException e) {
             throw new RuntimeException(e);
           }

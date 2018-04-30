@@ -36,13 +36,14 @@ import org.apache.calcite.sql2rel.RelDecorrelator;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.util.Closer;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -192,8 +193,7 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
   /** Sets the SQL statement for a test. */
   Sql sql(String sql) {
     return new Sql(sql, null, null,
-        ImmutableMap.<Hook, Function>of(),
-        ImmutableList.<Function<Tester, Tester>>of());
+        ImmutableMap.of(), ImmutableList.of());
   }
 
   /** Allows fluent testing. */
@@ -201,11 +201,11 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
     private final String sql;
     private HepProgram preProgram;
     private final HepPlanner hepPlanner;
-    private final ImmutableMap<Hook, Function> hooks;
+    private final ImmutableMap<Hook, Consumer> hooks;
     private ImmutableList<Function<Tester, Tester>> transforms;
 
     Sql(String sql, HepProgram preProgram, HepPlanner hepPlanner,
-        ImmutableMap<Hook, Function> hooks,
+        ImmutableMap<Hook, Consumer> hooks,
         ImmutableList<Function<Tester, Tester>> transforms) {
       this.sql = sql;
       this.preProgram = preProgram;
@@ -239,15 +239,23 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
     }
 
     /** Adds a hook and a handler for that hook. Calcite will create a thread
-     * hook (by calling {@link Hook#addThread(com.google.common.base.Function)})
+     * hook (by calling {@link Hook#addThread(Consumer)})
      * just before running the query, and remove the hook afterwards. */
-    public <T> Sql withHook(Hook hook, Function<T, Void> handler) {
+    public <T> Sql withHook(Hook hook, Consumer<T> handler) {
       return new Sql(sql, preProgram, hepPlanner,
           FlatLists.append(hooks, hook, handler), transforms);
     }
 
+    /** @deprecated Use {@link #withHook(Hook, Consumer)}. */
+    @SuppressWarnings("Guava")
+    @Deprecated // to be removed before 2.0
+    public <T> Sql withHook(Hook hook,
+        com.google.common.base.Function<T, Void> handler) {
+      return withHook(hook, (Consumer<T>) handler::apply);
+    }
+
     public <V> Sql withProperty(Hook hook, V value) {
-      return withHook(hook, Hook.property(value));
+      return withHook(hook, Hook.propertyJ(value));
     }
 
     public Sql expand(final boolean b) {
@@ -278,9 +286,10 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
       check(true);
     }
 
+    @SuppressWarnings("unchecked")
     private void check(boolean unchanged) {
       try (final Closer closer = new Closer()) {
-        for (Map.Entry<Hook, Function> entry : hooks.entrySet()) {
+        for (Map.Entry<Hook, Consumer> entry : hooks.entrySet()) {
           closer.add(entry.getKey().addThread(entry.getValue()));
         }
         Tester t = tester;

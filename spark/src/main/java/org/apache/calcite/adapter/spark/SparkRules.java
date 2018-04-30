@@ -71,7 +71,6 @@ import java.lang.reflect.Type;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -396,7 +395,8 @@ public abstract class SparkRules {
     final JavaSparkContext sc = new JavaSparkContext("local[1]", "calcite");
     final JavaRDD<String> file = sc.textFile("/usr/share/dict/words");
     System.out.println(
-        file.map((Function<String, Object>) s -> s.substring(0, Math.min(s.length(), 1))).distinct().count());
+        file.map(s -> s.substring(0, Math.min(s.length(), 1)))
+            .distinct().count());
     file.cache();
     String s =
         file.groupBy((Function<String, String>) s1 -> s1.substring(0, Math.min(s1.length(), 1))

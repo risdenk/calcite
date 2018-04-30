@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql.validate;
 
-import com.google.common.base.Function;
 
 /** One of the inputs of a {@link SqlValidatorScope}.
  *

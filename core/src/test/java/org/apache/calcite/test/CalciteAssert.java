@@ -52,7 +52,6 @@ import org.apache.calcite.util.Util;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
@@ -358,12 +357,12 @@ public class CalciteAssert {
    *
    * @param ordered Whether order should be the same both times
    */
-  static Function<ResultSet, Void> consistentResult(final boolean ordered) {
-    return new Function<ResultSet, Void>() {
+  static Consumer<ResultSet> consistentResult(final boolean ordered) {
+    return new Consumer<ResultSet>() {
       int executeCount = 0;
       Collection expected;
 
-      public Void apply(ResultSet resultSet) {
+      public void accept(ResultSet resultSet) {
         ++executeCount;
         try {
           final Collection result =
@@ -378,7 +377,6 @@ public class CalciteAssert {
               fail("oops");
             }
           }
-          return null;
         } catch (SQLException e) {
           throw new RuntimeException(e);
         }
@@ -1289,7 +1287,8 @@ public class CalciteAssert {
 
     @SuppressWarnings("Guava")
     @Deprecated // to be removed in 2.0
-    public final AssertQuery returns(Function<ResultSet, Void> checker) {
+    public final AssertQuery returns(
+        com.google.common.base.Function<ResultSet, Void> checker) {
       return returns(sql, checker::apply);
     }
 
@@ -1483,18 +1482,26 @@ public class CalciteAssert {
      * queries. The checker should throw to fail the test if it does not see
      * what it wants. This method can be used to check whether a particular
      * MongoDB or SQL query is generated, for instance. */
-    public AssertQuery queryContains(Function<List, Void> predicate1) {
+    public AssertQuery queryContains(Consumer<List> predicate1) {
       final List<Object> list = new ArrayList<>();
       addHook(Hook.QUERY_PLAN, list::add);
       try {
         assertQuery(createConnection(), sql, limit, materializationsEnabled,
             hooks, null, null, null);
-        predicate1.apply(list);
+        predicate1.accept(list);
         return this;
       } catch (Exception e) {
         throw new RuntimeException(
             "exception while executing [" + sql + "]", e);
       }
+    }
+
+    /** @deprecated Use {@link #queryContains(Consumer)}. */
+    @SuppressWarnings("Guava")
+    @Deprecated // to be removed before 2.0
+    public final AssertQuery queryContains(
+        com.google.common.base.Function<List, Void> predicate1) {
+      return queryContains((Consumer<List>) predicate1::apply);
     }
 
     /** Sets a limit on the number of rows returned. -1 means no limit. */
@@ -1509,7 +1516,7 @@ public class CalciteAssert {
         materializationsEnabled = false;
         final boolean ordered =
             sql.toUpperCase(Locale.ROOT).contains("ORDER BY");
-        final Function<ResultSet, Void> checker = consistentResult(ordered);
+        final Consumer<ResultSet> checker = consistentResult(ordered);
         returns(checker);
         materializationsEnabled = true;
         returns(checker);
@@ -1551,10 +1558,10 @@ public class CalciteAssert {
     public AssertQuery withRel(final Function<RelBuilder, RelNode> relFn) {
       return withHook(Hook.STRING_TO_QUERY,
           (Consumer<Pair<FrameworkConfig, Holder<CalcitePrepare.Query>>>)
-              pair -> {
-                final RelBuilder b = RelBuilder.create(pair.left);
-                pair.right.set(CalcitePrepare.Query.of(relFn.apply(b)));
-              });
+          pair -> {
+            final RelBuilder b = RelBuilder.create(pair.left);
+            pair.right.set(CalcitePrepare.Query.of(relFn.apply(b)));
+          });
     }
   }
 
@@ -1692,8 +1699,7 @@ public class CalciteAssert {
       return this;
     }
 
-    @Override public AssertQuery
-    queryContains(Function<List, Void> predicate1) {
+    @Override public AssertQuery queryContains(Consumer<List> predicate1) {
       return this;
     }
   }

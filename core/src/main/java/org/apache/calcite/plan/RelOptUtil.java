@@ -80,7 +80,6 @@ import org.apache.calcite.rex.RexToSqlNodeConverterImpl;
 import org.apache.calcite.rex.RexUtil;
 import org.apache.calcite.rex.RexVisitorImpl;
 import org.apache.calcite.runtime.CalciteContextException;
-import org.apache.calcite.runtime.PredicateImpl;
 import org.apache.calcite.schema.ModifiableView;
 import org.apache.calcite.sql.SqlExplainFormat;
 import org.apache.calcite.sql.SqlExplainLevel;
@@ -102,7 +101,6 @@ import org.apache.calcite.util.mapping.Mapping;
 import org.apache.calcite.util.mapping.MappingType;
 import org.apache.calcite.util.mapping.Mappings;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
@@ -138,26 +136,20 @@ public abstract class RelOptUtil {
 
   public static final double EPSILON = 1.0e-5;
 
-  /** Predicate for whether a filter contains multisets or windowed
-   * aggregates. */
+  @SuppressWarnings("Guava")
+  @Deprecated // to be removed before 2.0
   public static final Predicate<Filter> FILTER_PREDICATE =
-      filter -> !(B
-          && RexMultisetUtil.containsMultiset(filter.getCondition(), true)
-          || RexOver.containsOver(filter.getCondition()));
+      RelOptUtil::containsMultisetOrWindowedAgg;
 
-  /** Predicate for whether a project contains multisets or windowed
-   * aggregates. */
+  @SuppressWarnings("Guava")
+  @Deprecated // to be removed before 2.0
   public static final Predicate<Project> PROJECT_PREDICATE =
-      project -> !(B
-          && RexMultisetUtil.containsMultiset(project.getProjects(), true)
-          || RexOver.containsOver(project.getProjects(), null));
+      RelOptUtil::containsMultisetOrWindowedAgg;
 
-  /** Predicate for whether a calc contains multisets or windowed
-   * aggregates. */
+  @SuppressWarnings("Guava")
+  @Deprecated // to be removed before 2.0
   public static final Predicate<Calc> CALC_PREDICATE =
-      calc -> !(B
-          && RexMultisetUtil.containsMultiset(calc.getProgram())
-          || calc.getProgram().containsAggs());
+      RelOptUtil::containsMultisetOrWindowedAgg;
 
   //~ Methods ----------------------------------------------------------------
 
@@ -3085,6 +3077,30 @@ public abstract class RelOptUtil {
       exprList.add(rexBuilder.makeInputRef(rel, source));
     }
     return projectFactory.createProject(rel, exprList, outputNameList);
+  }
+
+  /** Predicate for whether a {@link Calc} contains multisets or windowed
+   * aggregates. */
+  public static boolean containsMultisetOrWindowedAgg(Calc calc) {
+    return !(B
+        && RexMultisetUtil.containsMultiset(calc.getProgram())
+        || calc.getProgram().containsAggs());
+  }
+
+  /** Predicate for whether a {@link Filter} contains multisets or windowed
+   * aggregates. */
+  public static boolean containsMultisetOrWindowedAgg(Filter filter) {
+    return !(B
+        && RexMultisetUtil.containsMultiset(filter.getCondition(), true)
+        || RexOver.containsOver(filter.getCondition()));
+  }
+
+  /** Predicate for whether a {@link Project} contains multisets or windowed
+   * aggregates. */
+  public static boolean containsMultisetOrWindowedAgg(Project project) {
+    return !(B
+        && RexMultisetUtil.containsMultiset(project.getProjects(), true)
+        || RexOver.containsOver(project.getProjects(), null));
   }
 
   /** Policies for handling two- and three-valued boolean logic. */

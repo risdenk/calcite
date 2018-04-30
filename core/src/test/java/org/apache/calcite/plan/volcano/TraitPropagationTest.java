@@ -71,7 +71,6 @@ import org.apache.calcite.tools.RuleSet;
 import org.apache.calcite.tools.RuleSets;
 import org.apache.calcite.util.ImmutableBitSet;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;

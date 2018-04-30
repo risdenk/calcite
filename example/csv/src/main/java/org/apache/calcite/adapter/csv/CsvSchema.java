@@ -24,7 +24,6 @@ import org.apache.calcite.util.Sources;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Map;
 
 /**

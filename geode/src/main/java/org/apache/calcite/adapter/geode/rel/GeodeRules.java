@@ -207,8 +207,8 @@ public class GeodeRules {
 
     private static final GeodeSortLimitRule INSTANCE =
         new GeodeSortLimitRule(
-          // OQL doesn't support for offsets (e.g. LIMIT 10 OFFSET 500)
-          sort -> sort.offset == null);
+            // OQL doesn't support for offsets (e.g. LIMIT 10 OFFSET 500)
+            sort -> sort.offset == null);
 
     GeodeSortLimitRule(Predicate<Sort> predicate) {
       super(operandJ(Sort.class, null, predicate, any()), "GeodeSortLimitRule");

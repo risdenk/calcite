@@ -17,7 +17,6 @@
 package org.apache.calcite.plan.volcano;
 
 import org.apache.calcite.linq4j.Linq4j;
-import org.apache.calcite.linq4j.function.Predicate1;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptListener;
@@ -41,7 +40,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;

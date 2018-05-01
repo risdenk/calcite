@@ -18,14 +18,12 @@ package org.apache.calcite.test;
 
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
 
 import java.util.List;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 
 /**
  * Tests for the {@code org.apache.calcite.adapter.elasticsearch2} package.

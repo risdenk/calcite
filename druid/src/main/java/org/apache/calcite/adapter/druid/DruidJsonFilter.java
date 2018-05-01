@@ -41,7 +41,6 @@ import java.util.TimeZone;
 
 import javax.annotation.Nullable;
 
-
 /**
  * Filter element of a Druid "groupBy" or "topN" query.
  */

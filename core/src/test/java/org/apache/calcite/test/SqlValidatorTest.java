@@ -43,7 +43,6 @@ import org.apache.calcite.sql.validate.SqlValidatorUtil;
 import org.apache.calcite.util.Bug;
 import org.apache.calcite.util.ImmutableBitSet;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -61,6 +60,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -5989,13 +5989,10 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
    * lurking in the validation process.
    */
   @Test public void testLarge() {
-    checkLarge(700, input -> {
-      check(input);
-      return null;
-    });
+    checkLarge(700, this::check);
   }
 
-  static void checkLarge(int x, Function<String, Void> f) {
+  static void checkLarge(int x, Consumer<String> f) {
     if (System.getProperty("os.name").startsWith("Windows")) {
       // NOTE jvs 1-Nov-2006:  Default thread stack size
       // on Windows is too small, so avoid stack overflow
@@ -6004,24 +6001,24 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
 
     // E.g. large = "deptno * 1 + deptno * 2 + deptno * 3".
     String large = list(" + ", "deptno * ", x);
-    f.apply("select " + large + "from emp");
-    f.apply("select distinct " + large + "from emp");
-    f.apply("select " + large + " from emp " + "group by deptno");
-    f.apply("select * from emp where " + large + " > 5");
-    f.apply("select * from emp order by " + large + " desc");
-    f.apply("select " + large + " from emp order by 1");
-    f.apply("select distinct " + large + " from emp order by " + large);
+    f.accept("select " + large + "from emp");
+    f.accept("select distinct " + large + "from emp");
+    f.accept("select " + large + " from emp " + "group by deptno");
+    f.accept("select * from emp where " + large + " > 5");
+    f.accept("select * from emp order by " + large + " desc");
+    f.accept("select " + large + " from emp order by 1");
+    f.accept("select distinct " + large + " from emp order by " + large);
 
     // E.g. "in (0, 1, 2, ...)"
-    f.apply("select * from emp where deptno in (" + list(", ", "", x) + ")");
+    f.accept("select * from emp where deptno in (" + list(", ", "", x) + ")");
 
     // E.g. "where x = 1 or x = 2 or x = 3 ..."
-    f.apply("select * from emp where " + list(" or ", "deptno = ", x));
+    f.accept("select * from emp where " + list(" or ", "deptno = ", x));
 
     // E.g. "select x1, x2 ... from (
     // select 'a' as x1, 'a' as x2, ... from emp union
     // select 'bb' as x1, 'bb' as x2, ... from dept)"
-    f.apply("select " + list(", ", "x", x)
+    f.accept("select " + list(", ", "x", x)
         + " from (select " + list(", ", "'a' as x", x) + " from emp "
         + "union all select " + list(", ", "'bb' as x", x) + " from dept)");
   }

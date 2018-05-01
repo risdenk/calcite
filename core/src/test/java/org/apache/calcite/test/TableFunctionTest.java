@@ -24,7 +24,6 @@ import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.TableFunctionImpl;
 import org.apache.calcite.util.Smalls;
 
-
 import org.junit.Ignore;
 import org.junit.Test;
 

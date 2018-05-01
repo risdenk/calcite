@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
 /**
  * Implementation of a {@link org.apache.calcite.rel.core.Filter}
  * relational expression in Elasticsearch.

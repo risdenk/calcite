@@ -20,7 +20,6 @@ import org.apache.calcite.config.Lex;
 import org.apache.calcite.test.CalciteAssert.AssertThat;
 import org.apache.calcite.test.CalciteAssert.DatabaseInstance;
 
-
 import org.hsqldb.jdbcDriver;
 
 import org.junit.Test;

@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 
 import static org.apache.calcite.util.Static.RESOURCE;
 
-
 /**
  * Abstract base for implementations of the {@link RelOptPlanner} interface.
  */

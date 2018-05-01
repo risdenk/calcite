@@ -16,8 +16,6 @@
  */
 package org.apache.calcite.test;
 
-
-
 import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;

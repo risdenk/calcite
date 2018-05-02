@@ -78,7 +78,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,10 +93,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -150,16 +146,11 @@ public class Util {
    * Maps classes to the map of their enum values. Uses a weak map so that
    * classes are not prevented from being unloaded.
    */
+  @SuppressWarnings("unchecked")
   private static final LoadingCache<Class, Map<String, Enum>> ENUM_CONSTANTS =
       CacheBuilder.newBuilder()
           .weakKeys()
-          .build(
-              new CacheLoader<Class, Map<String, Enum>>() {
-                @Override public Map<String, Enum> load(Class clazz) {
-                  //noinspection unchecked
-                  return enumConstants(clazz);
-                }
-              });
+          .build(CacheLoader.from(Util::enumConstants));
 
   //~ Methods ----------------------------------------------------------------
   /**
@@ -2357,30 +2348,12 @@ public class Util {
    */
   public static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>
       toImmutableList() {
-    return new Collector<T, ImmutableList.Builder<T>, ImmutableList<T>>() {
-      public Supplier<ImmutableList.Builder<T>> supplier() {
-        return ImmutableList::builder;
-      }
-
-      public BiConsumer<ImmutableList.Builder<T>, T> accumulator() {
-        return ImmutableList.Builder::add;
-      }
-
-      public BinaryOperator<ImmutableList.Builder<T>> combiner() {
-        return (t, u) -> {
+    return Collector.of(ImmutableList::builder, ImmutableList.Builder::add,
+        (t, u) -> {
           t.addAll(u.build());
           return t;
-        };
-      }
-
-      public java.util.function.Function<ImmutableList.Builder<T>, ImmutableList<T>> finisher() {
-        return ImmutableList.Builder::build;
-      }
-
-      public Set<Characteristics> characteristics() {
-        return Collections.emptySet();
-      }
-    };
+        },
+        ImmutableList.Builder::build);
   }
 
   //~ Inner Classes ----------------------------------------------------------

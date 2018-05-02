@@ -47,16 +47,12 @@ public class MetadataFactoryImpl implements MetadataFactory {
 
   private static CacheLoader<Pair<Class<RelNode>, Class<Metadata>>,
       UnboundMetadata<Metadata>> loader(final RelMetadataProvider provider) {
-    return new CacheLoader<Pair<Class<RelNode>, Class<Metadata>>,
-        UnboundMetadata<Metadata>>() {
-      @Override public UnboundMetadata<Metadata> load(
-          Pair<Class<RelNode>, Class<Metadata>> key) throws Exception {
-        final UnboundMetadata<Metadata> function =
-            provider.apply(key.left, key.right);
-        // Return DUMMY, not null, so the cache knows to not ask again.
-        return function != null ? function : DUMMY;
-      }
-    };
+    return CacheLoader.from(key -> {
+      final UnboundMetadata<Metadata> function =
+          provider.apply(key.left, key.right);
+      // Return DUMMY, not null, so the cache knows to not ask again.
+      return function != null ? function : DUMMY;
+    });
   }
 
   public <M extends Metadata> M query(RelNode rel, RelMetadataQuery mq,

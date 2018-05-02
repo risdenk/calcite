@@ -1080,6 +1080,7 @@ public class CalciteAssert {
   }
 
   /** Connection post processor */
+  @FunctionalInterface
   public interface ConnectionPostProcessor {
     Connection apply(Connection connection) throws SQLException;
   }

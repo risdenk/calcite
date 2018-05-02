@@ -210,17 +210,18 @@ final class JdbcUtils {
     public static final DataSourcePool INSTANCE = new DataSourcePool();
 
     private final LoadingCache<List<String>, BasicDataSource> cache =
-        CacheBuilder.newBuilder().softValues().build(
-            new CacheLoader<List<String>, BasicDataSource>() {
-              @Override public BasicDataSource load(@Nonnull List<String> key) {
-                BasicDataSource dataSource = new BasicDataSource();
-                dataSource.setUrl(key.get(0));
-                dataSource.setUsername(key.get(1));
-                dataSource.setPassword(key.get(2));
-                dataSource.setDriverClassName(key.get(3));
-                return dataSource;
-              }
-            });
+        CacheBuilder.newBuilder().softValues()
+            .build(CacheLoader.from(DataSourcePool::dataSource));
+
+    private static @Nonnull BasicDataSource dataSource(
+          @Nonnull List<String> key) {
+      BasicDataSource dataSource = new BasicDataSource();
+      dataSource.setUrl(key.get(0));
+      dataSource.setUsername(key.get(1));
+      dataSource.setPassword(key.get(2));
+      dataSource.setDriverClassName(key.get(3));
+      return dataSource;
+    }
 
     public DataSource get(String url, String driverClassName,
         String username, String password) {

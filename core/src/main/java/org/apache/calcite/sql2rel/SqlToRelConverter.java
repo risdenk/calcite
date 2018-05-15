@@ -196,6 +196,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -316,7 +317,7 @@ public class SqlToRelConverter {
     this.subQueryConverter = new NoOpSubQueryConverter();
     this.rexBuilder = cluster.getRexBuilder();
     this.typeFactory = rexBuilder.getTypeFactory();
-    this.cluster = Preconditions.checkNotNull(cluster);
+    this.cluster = Objects.requireNonNull(cluster);
     this.exprConverter = new SqlNodeToRexConverterImpl(convertletTable);
     this.explainParamCount = 0;
     this.config = new ConfigBuilder().withConfig(config).build();
@@ -4490,8 +4491,8 @@ public class SqlToRelConverter {
       case CURSOR:
       case IN:
       case NOT_IN:
-        subQuery = Preconditions.checkNotNull(getSubQuery(expr));
-        rex = Preconditions.checkNotNull(subQuery.expr);
+        subQuery = Objects.requireNonNull(getSubQuery(expr));
+        rex = Objects.requireNonNull(subQuery.expr);
         return StandardConvertletTable.castToValidatedType(expr, rex,
             validator, rexBuilder);
 
@@ -4538,7 +4539,7 @@ public class SqlToRelConverter {
 
       // Apply standard conversions.
       rex = expr.accept(this);
-      return Preconditions.checkNotNull(rex);
+      return Objects.requireNonNull(rex);
     }
 
     /**

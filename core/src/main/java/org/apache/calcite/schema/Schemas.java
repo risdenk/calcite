@@ -41,7 +41,6 @@ import org.apache.calcite.tools.RelRunner;
 import org.apache.calcite.util.BuiltInMethod;
 import org.apache.calcite.util.Pair;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -55,6 +54,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Utility functions for schemas.
@@ -501,7 +501,7 @@ public final class Schemas {
 
   /** Generates a table name that is unique within the given schema. */
   public static String uniqueTableName(CalciteSchema schema, String base) {
-    String t = Preconditions.checkNotNull(base);
+    String t = Objects.requireNonNull(base);
     for (int x = 0; schema.getTable(t, true) != null; x++) {
       t = base + x;
     }

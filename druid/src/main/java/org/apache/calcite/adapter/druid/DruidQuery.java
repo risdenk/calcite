@@ -66,7 +66,6 @@ import org.apache.calcite.util.Util;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -185,7 +184,7 @@ public class DruidQuery extends AbstractRelNode implements BindableRel {
     this.druidTable = druidTable;
     this.intervals = ImmutableList.copyOf(intervals);
     this.rels = ImmutableList.copyOf(rels);
-    this.converterOperatorMap = Preconditions.checkNotNull(converterOperatorMap, "Operator map "
+    this.converterOperatorMap = Objects.requireNonNull(converterOperatorMap, "Operator map "
         + "can not be null");
     assert isValid(Litmus.THROW, null);
   }
@@ -976,7 +975,7 @@ public class DruidQuery extends AbstractRelNode implements BindableRel {
       final ScanQuery scanQuery = new ScanQuery(druidTable.dataSource, intervals, jsonFilter,
           virtualColumnList, scanColumnNames, fetch);
       return new QuerySpec(QueryType.SCAN,
-          Preconditions.checkNotNull(scanQuery.toQuery(), "Can not plan Scan Druid Query"),
+          Objects.requireNonNull(scanQuery.toQuery(), "Can not plan Scan Druid Query"),
           scanColumnNames);
     }
 
@@ -1517,8 +1516,8 @@ public class DruidQuery extends AbstractRelNode implements BindableRel {
 
     QuerySpec(QueryType queryType, String queryString,
         List<String> fieldNames) {
-      this.queryType = Preconditions.checkNotNull(queryType);
-      this.queryString = Preconditions.checkNotNull(queryString);
+      this.queryType = Objects.requireNonNull(queryType);
+      this.queryString = Objects.requireNonNull(queryString);
       this.fieldNames = ImmutableList.copyOf(fieldNames);
     }
 

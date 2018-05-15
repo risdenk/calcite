@@ -53,7 +53,6 @@ import org.apache.calcite.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -827,7 +826,7 @@ public class CalciteAssert {
         new AssertThat(EMPTY_CONNECTION_FACTORY);
 
     private AssertThat(ConnectionFactory connectionFactory) {
-      this.connectionFactory = Preconditions.checkNotNull(connectionFactory);
+      this.connectionFactory = Objects.requireNonNull(connectionFactory);
     }
 
     public AssertThat with(Config config) {
@@ -1173,8 +1172,8 @@ public class CalciteAssert {
 
     private MapConnectionFactory(ImmutableMap<String, String> map,
         ImmutableList<ConnectionPostProcessor> postProcessors) {
-      this.map = Preconditions.checkNotNull(map);
-      this.postProcessors = Preconditions.checkNotNull(postProcessors);
+      this.map = Objects.requireNonNull(map);
+      this.postProcessors = Objects.requireNonNull(postProcessors);
     }
 
     @Override public boolean equals(Object obj) {

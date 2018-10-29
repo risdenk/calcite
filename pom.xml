@@ -123,7 +123,7 @@ limitations under the License.
     <natty.version>0.13</natty.version>
     <opencsv.version>2.3</opencsv.version>
     <oracle-jdbc6-driver.version>11.2.0.2.0</oracle-jdbc6-driver.version>
-    <owasp-dependency-check.version>3.3.1</owasp-dependency-check.version>
+    <owasp-dependency-check.version>3.3.4</owasp-dependency-check.version>
     <pig.version>0.16.0</pig.version>
     <aggdesigner.version>6.0</aggdesigner.version>
     <postgresql.version>9.3-1102-jdbc3</postgresql.version>

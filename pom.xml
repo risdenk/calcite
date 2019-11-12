@@ -131,7 +131,7 @@ limitations under the License.
     <opencsv.version>2.3</opencsv.version>
     <oracle-jdbc6-driver.version>11.2.0.2.0</oracle-jdbc6-driver.version>
     <owasp-dependency-check.version>5.2.1</owasp-dependency-check.version>
-    <pig.version>0.16.0</pig.version>
+    <pig.version>0.17.0</pig.version>
     <postgresql.version>9.3-1102-jdbc41</postgresql.version>
     <quidem.version>0.9</quidem.version>
     <scala.version>2.10.3</scala.version>

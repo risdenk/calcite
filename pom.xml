@@ -83,7 +83,7 @@ limitations under the License.
     <esri-geometry-api.version>2.2.0</esri-geometry-api.version>
     <findbugs.version>3.0.1</findbugs.version>
     <fmpp.version>0.9.16</fmpp.version>
-    <mongo-java-server.version>1.16.0</mongo-java-server.version>
+    <mongo-java-server.version>1.23.0</mongo-java-server.version>
     <foodmart-data-hsqldb.version>0.3</foodmart-data-hsqldb.version>
     <foodmart-data-json.version>0.4</foodmart-data-json.version>
     <foodmart-queries.version>0.4.1</foodmart-queries.version>

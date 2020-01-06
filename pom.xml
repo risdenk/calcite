@@ -74,7 +74,7 @@ limitations under the License.
     <checkstyle.version>7.8.2</checkstyle.version>
     <checksum-maven-plugin.version>1.2</checksum-maven-plugin.version>
     <chinook-data-hsqldb.version>0.1</chinook-data-hsqldb.version>
-    <commons-codec.version>1.12</commons-codec.version>
+    <commons-codec.version>1.14</commons-codec.version>
     <commons-dbcp2.version>2.6.0</commons-dbcp2.version>
     <commons-lang3.version>3.8</commons-lang3.version>
     <commons-pool2.version>2.6.2</commons-pool2.version>

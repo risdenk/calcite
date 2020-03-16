@@ -67,7 +67,7 @@ limitations under the License.
     <aggdesigner.version>6.0</aggdesigner.version>
     <airlift-tpch.version>0.1</airlift-tpch.version>
     <avatica.version>1.15.0</avatica.version>
-    <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+    <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
     <cassandra-driver-core.version>3.6.0</cassandra-driver-core.version>
     <cassandra-unit.version>3.5.0.1</cassandra-unit.version>
     <cassandra.version>3.11.2</cassandra.version>
